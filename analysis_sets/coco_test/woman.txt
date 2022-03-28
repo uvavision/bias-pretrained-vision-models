@@ -1,0 +1,15 @@
+http://images.cocodataset.org/val2017/000000565877.jpg
+http://images.cocodataset.org/val2017/000000561256.jpg
+http://images.cocodataset.org/val2017/000000559543.jpg
+http://images.cocodataset.org/val2017/000000554579.jpg
+http://images.cocodataset.org/val2017/000000551439.jpg
+http://images.cocodataset.org/val2017/000000547336.jpg
+http://images.cocodataset.org/val2017/000000546717.jpg
+http://images.cocodataset.org/val2017/000000512929.jpg
+http://images.cocodataset.org/val2017/000000358195.jpg
+http://images.cocodataset.org/val2017/000000381639.jpg
+http://images.cocodataset.org/val2017/000000008690.jpg
+http://images.cocodataset.org/val2017/000000009448.jpg
+http://images.cocodataset.org/val2017/000000027186.jpg
+http://images.cocodataset.org/val2017/000000066886.jpg
+http://images.cocodataset.org/val2017/000000162415.jpg

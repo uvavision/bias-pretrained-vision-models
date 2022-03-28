@@ -1,0 +1,9 @@
+http://images.cocodataset.org/train2017/000000296243.jpg
+http://images.cocodataset.org/train2017/000000226599.jpg
+http://images.cocodataset.org/train2017/000000022575.jpg
+http://images.cocodataset.org/val2017/000000278705.jpg
+http://images.cocodataset.org/val2017/000000102805.jpg
+http://images.cocodataset.org/val2017/000000213255.jpg
+http://images.cocodataset.org/val2017/000000442456.jpg
+http://images.cocodataset.org/val2017/000000566282.jpg
+http://images.cocodataset.org/val2017/000000357737.jpg

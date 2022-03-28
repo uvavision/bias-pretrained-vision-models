@@ -1,0 +1,113 @@
+INDIVIDUAL_PLOTS:
+    category_list : ['car', 'surfboard', 'refrigerator']
+    car : ['car+man', 'car+woman', 'car', 'car+man vs car', 'car+woman vs car', 'car vs random', 'man', 'woman', 'random', 'stopsign']
+    surfboard : ['surfb+man', 'surfb+woman', 'surfb', 'surfb+man vs surfb', 'surfb+woman vs surfb', 'surfb vs random', 'man', 'woman', 'random', 'stopsign']
+    refrigerator : ['refrig+man', 'refrig+woman', 'refrig', 'refrig+man vs refrig', 'refrig+woman vs refrig', 'refrig vs random', 'man', 'woman',  'random', 'stopsign']
+INDIVIDUAL_PLOTS_COMPS:
+    car : ['car+man', 'car+woman', 'car', 'car+man vs car', 'car+woman vs car', 'car vs random', 'random', 'man', 'woman']
+    surfboard : ['surfb+man', 'surfb+woman', 'surfb', 'surfb+man vs surfb', 'surfb+woman vs surfb', 'surfb vs random', 'man', 'woman', 'random']
+    refrigerator : ['refrig+man', 'refrig+woman', 'refrig', 'refrig+man vs refrig', 'refrig+woman vs refrig', 'refrig vs random', 'man', 'woman',  'random']
+
+MISC_PLOTS:
+    misc_plots_names : ['pairs', 'comps', 'indiv', 'object']
+    indiv : ['refrig', 'surfb', 'car', 'random', 'stopsign', 'man', 'woman']
+    pairs : ['refrig+man', 'refrig+woman', 'surfb+man', 'surfb+woman', 'car+man', 'car+woman', 'random']
+    comps : ['refrig+man vs refrig', 'refrig+woman vs refrig', 'refrig vs random','surfb+man vs surfb', 'surfb+woman vs surfb', 'surfb vs random','car+man vs car', 'car+woman vs car', 'car vs random', 'random']
+    object : ['surfb', 'surfb vs man', 'surfb vs woman','car', 'car vs man', 'car vs woman', 'refrig', 'refrig vs man', 'refrig vs woman', 'random', 'random vs man', 'random vs woman', 'stopsign', 'stopsign vs man', 'stopsign vs woman']
+COMPS:
+    'refrig+man vs refrig': ['rm', 'ra']
+    'refrig+woman vs refrig': ['rw', 'ra']
+    'refrig vs random': ['ra', 'random']
+    'refrig vs man' : ['ra', 'man']
+    'refrig vs woman': ['ra', 'woman']
+    'surfb+man vs surfb': ['sm', 'sa']
+    'surfb+woman vs surfb': ['sw', 'sa']
+    'surfb vs random': ['sa', 'random']
+    'surfb vs man': ['sa', 'man']
+    'surfb vs woman': ['sa', 'woman']
+    'car+man vs car': ['cm', 'ca']
+    'car+woman vs car': ['cw', 'ca']
+    'car vs random': ['ca', 'random']
+    'car vs man': ['ca', 'man']
+    'car vs woman': ['ca', 'woman']
+    'stopsign vs man': ['stop', 'man']
+    'stopsign vs woman': ['stop', 'woman']
+    'random vs man': ['random', 'man']
+    'random vs woman': ['random', 'woman']
+
+LABELS_NAMES:
+    sm : 'surfb+man'
+    sw : 'surfb+woman'
+    sa : 'surfb'
+
+    rm: 'refrig+man'
+    rw : 'refrig+woman'
+    ra : 'refrig'
+
+    cm: 'car+man'
+    cw : 'car+woman'
+    ca : 'car'
+
+    man : 'man'
+
+    woman: 'woman'
+
+    random: 'random'
+
+    stop: 'stopsign'
+
+CLASSES_NAMES:
+    SURFBOARD:
+        man_object: 'sm'
+        woman_object: 'sw'
+        object: 'sa'
+
+    REFRIGERATOR:
+        man_object: 'rm'
+        woman_object: 'rw'
+        object: 'ra'
+
+    CAR:
+        man_object: 'cm'
+        woman_object: 'cw'
+        object: 'ca'
+
+    MAN:
+        man: 'man'
+
+    WOMAN:
+        woman: 'woman'
+
+    RANDOM:
+        random_loaded: 'random'
+
+    STOPSIGN:
+        stop_sign: 'stop'
+
+CLASSES:
+    SURFBOARD:
+        man_object: 'analysis_sets/coco_test/surfboard_man.txt'
+        woman_object: 'analysis_sets/coco_test/surfboard_woman.txt'
+        object: 'analysis_sets/coco_test/surfboard.txt'
+
+    REFRIGERATOR:
+        man_object: 'analysis_sets/coco_test/refrigerator_man.txt'
+        woman_object: 'analysis_sets/coco_test/refrigerator_woman.txt'
+        object: 'analysis_sets/coco_test/refrigerator.txt'
+
+    CAR:
+        man_object: 'analysis_sets/coco_test/car_man.txt'
+        woman_object: 'analysis_sets/coco_test/car_woman.txt'
+        object: 'analysis_sets/coco_test/car.txt'
+
+    MAN:
+        man: 'analysis_sets/coco_test/man.txt'
+
+    WOMAN:
+        woman: 'analysis_sets/coco_test/woman.txt'
+
+    RANDOM:
+        random_loaded: 'analysis_sets/coco_test/random.txt'
+
+    STOPSIGN:
+        stop_sign: 'analysis_sets/coco_test/stop_sign.txt'

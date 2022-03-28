@@ -1,0 +1,134 @@
+INDIVIDUAL_PLOTS:
+    category_list : ['car', 'sports', 'fashion', 'mammal']
+    car : ['car+man', 'car+woman', 'car', 'car+man vs car', 'car+woman vs car', 'car vs random', 'man', 'woman', 'random', 'stopsign']
+    sports : ['sports+man', 'sports+woman', 'sports', 'sports+man vs sports', 'sports+woman vs sports', 'sports vs random', 'man', 'woman', 'random', 'stopsign']
+    fashion : ['fashion+man', 'fashion+woman', 'fashion', 'fashion+man vs fashion', 'fashion+woman vs fashion', 'fashion vs random', 'man', 'woman', 'random', 'stopsign']
+    mammal : ['mammal+man', 'mammal+woman', 'mammal', 'mammal+man vs mammal', 'mammal+woman vs mammal', 'mammal vs random', 'man', 'woman', 'random', 'stopsign']
+
+INDIVIDUAL_PLOTS_COMPS:
+    car : ['car+man', 'car+woman', 'car', 'car+man vs car', 'car+woman vs car', 'car vs random', 'random', 'man', 'woman']
+    sports : ['sports+man', 'sports+woman', 'sports', 'sports+man vs sports', 'sports+woman vs sports', 'sports vs random', 'man', 'woman', 'random']
+    fashion : ['fashion+man', 'fashion+woman', 'fashion', 'fashion+man vs fashion', 'fashion+woman vs fashion', 'fashion vs random', 'man', 'woman', 'random']
+    mammal : ['mammal+man', 'mammal+woman', 'mammal', 'mammal+man vs mammal', 'mammal+woman vs mammal', 'mammal vs random', 'man', 'woman', 'random']
+
+MISC_PLOTS:
+    misc_plots_names : ['pairs', 'comps', 'indiv', 'object']
+    indiv : ['sports', 'fashion', 'mammal', 'car', 'random', 'stopsign', 'man', 'woman']
+    pairs : ['sports+man', 'sports+woman', 'car+man', 'car+woman', 'fashion+man', 'fashion+woman','mammal+man', 'mammal+woman','random']
+    comps : ['sports+man vs sports', 'sports+woman vs sports', 'sports vs random','car+man vs car', 'car+woman vs car', 'car vs random', 'fashion+man vs fashion', 'fashion+woman vs fashion', 'fashion vs random', 'mammal+man vs mammal', 'mammal+woman vs mammal', 'mammal vs random', 'random']
+    object : ['sports', 'sports vs man', 'sports vs woman', 'mammal', 'mammal vs man', 'mammal vs woman', 'fashion', 'fashion vs man', 'fashion vs woman',  'car', 'car vs man', 'car vs woman', 'random', 'random vs man', 'random vs woman', 'stopsign', 'stopsign vs man', 'stopsign vs woman']
+COMPS:
+    'sports+man vs sports': ['sm', 'sa']
+    'sports+woman vs sports': ['sw', 'sa']
+    'sports vs random': ['sa', 'random']
+    'sports vs man': ['sa', 'man']
+    'sports vs woman': ['sa', 'woman']
+
+    'fashion+man vs fashion': ['fm', 'fa']
+    'fashion+woman vs fashion': ['fw', 'fa']
+    'fashion vs random': ['fa', 'random']
+    'fashion vs man': ['fa', 'man']
+    'fashion vs woman': ['fa', 'woman']
+
+    'mammal+man vs mammal': ['mm', 'sa']
+    'mammal+woman vs mammal': ['mw', 'sa']
+    'mammal vs random': ['ma', 'random']
+    'mammal vs man': ['ma', 'man']
+    'mammal vs woman': ['ma', 'woman']
+
+    'car+man vs car': ['cm', 'ca']
+    'car+woman vs car': ['cw', 'ca']
+    'car vs random': ['ca', 'random']
+    'car vs man': ['ca', 'man']
+    'car vs woman': ['ca', 'woman']
+
+    'stopsign vs man': ['stop', 'man']
+    'stopsign vs woman': ['stop', 'woman']
+    'random vs man': ['random', 'man']
+    'random vs woman': ['random', 'woman']
+
+LABELS_NAMES:
+    sm : 'sports+man'
+    sw : 'sports+woman'
+    sa : 'sports'
+
+    fm : 'fashion+man'
+    fw : 'fashion+woman'
+    fa : 'fashion'
+
+    mm : 'mammal+man'
+    mw : 'mammal+woman'
+    ma : 'mammal'
+
+    cm: 'car+man'
+    cw : 'car+woman'
+    ca : 'car'
+
+    man : 'man'
+
+    woman: 'woman'
+
+    random: 'random'
+
+    stop: 'stopsign'
+
+CLASSES_NAMES:
+    SPORTS:
+        man_object: 'sm'
+        woman_object: 'sw'
+        object: 'sa'
+    FASHION:
+        man_object: 'fm'
+        woman_object: 'fw'
+        object: 'fa'
+    MAMMAL:
+        man_object: 'mm'
+        woman_object: 'mw'
+        object: 'ma'
+    CAR:
+        man_object: 'cm'
+        woman_object: 'cw'
+        object: 'ca'
+
+    MAN:
+        man: 'man'
+
+    WOMAN:
+        woman: 'woman'
+
+    RANDOM:
+        random_loaded: 'random'
+
+    STOPSIGN:
+        stop_sign: 'stop'
+
+CLASSES:
+    SPORTS:
+        man_object: 'analysis_sets/openimages_test/sports_man.txt'
+        woman_object: 'analysis_sets/openimages_test/sports_woman.txt'
+        object: 'analysis_sets/openimages_test/sports.txt'
+    FASHION:
+        man_object: 'analysis_sets/openimages_test/fashion_man.txt'
+        woman_object: 'analysis_sets/openimages_test/fashion_woman.txt'
+        object: 'analysis_sets/openimages_test/fashion.txt'
+    MAMMAL:
+        man_object: 'analysis_sets/openimages_test/mammal_man.txt'
+        woman_object: 'analysis_sets/openimages_test/mammal_woman.txt'
+        object: 'analysis_sets/openimages_test/mammal.txt'
+
+    CAR:
+        man_object: 'analysis_sets/openimages_test/car_man.txt'
+        woman_object: 'analysis_sets/openimages_test/car_woman.txt'
+        object: 'analysis_sets/openimages_test/car.txt'
+
+    MAN:
+        man: 'analysis_sets/openimages_test/man.txt'
+
+    WOMAN:
+        woman: 'analysis_sets/openimages_test/woman.txt'
+
+    RANDOM:
+        random_loaded: 'analysis_sets/openimages_test/random.txt'
+
+    STOPSIGN:
+        stop_sign: 'analysis_sets/openimages_test/stop_sign.txt'

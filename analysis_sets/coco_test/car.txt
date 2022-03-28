@@ -1,0 +1,12 @@
+http://images.cocodataset.org/train2017/000000547352.jpg
+http://images.cocodataset.org/train2017/000000158130.jpg
+http://images.cocodataset.org/train2017/000000103498.jpg
+http://images.cocodataset.org/val2017/000000543043.jpg
+http://images.cocodataset.org/val2017/000000041633.jpg
+http://images.cocodataset.org/train2017/000000453310.jpg
+http://images.cocodataset.org/val2017/000000065485.jpg
+http://images.cocodataset.org/val2017/000000141597.jpg
+http://images.cocodataset.org/val2017/000000198805.jpg
+http://images.cocodataset.org/val2017/000000089556.jpg
+http://images.cocodataset.org/val2017/000000263594.jpg
+http://images.cocodataset.org/val2017/000000293071.jpg
