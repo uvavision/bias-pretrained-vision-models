@@ -226,11 +226,10 @@ class CLIP_model():
         return model, val_acc_history, total_targets
 
 class ClipViTFeatureExtractor():
-    def __init__(self, dataset, model_path, model_name, num_classes):
+    def __init__(self, dataset, model_path, model_name, num_classes, openimages_path=None):
         self.dataset = dataset
         if self.dataset == 'openimages':
-            #self.openimages_path = "/data/openimages/openimages/val/"
-            self.openimages_path = "../VisionResearch/finetuneClip/openimages_dataset/val/"
+            self.openimages_path = openimages_path+"val/"
         self.model_path = model_path
         self.model_name = model_name
         self.num_classes = num_classes

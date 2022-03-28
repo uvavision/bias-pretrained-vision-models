@@ -281,9 +281,9 @@ def lightning_train(args, dataloaders, model_path, resume_training=False, checkp
 
 def extract_features(model_name, args, model_path, only_pretrained, model_ft=None):
     if model_name == 'clip':
-        feature_extractor = ClipViTFeatureExtractor(args.analysis_set, model_path, model_name, args.num_classes)
+        feature_extractor = ClipViTFeatureExtractor(args.analysis_set, model_path, model_name, args.num_classes, args.openimages)
     else:
-        feature_extractor = PytorchFeatureExtractor(args.analysis_set, model_path, model_name, args.num_classes)
+        feature_extractor = PytorchFeatureExtractor(args.analysis_set, model_path, model_name, args.num_classes, args.openimages)
 
     if only_pretrained == True:
         features = feature_extractor.extract_features(dataset_name=args.analysis_set, only_pretrained=True, finetune=args.finetune, config=args.config_file, pca=args.pca)
