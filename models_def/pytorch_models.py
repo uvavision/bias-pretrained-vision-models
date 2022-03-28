@@ -47,7 +47,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 from model_init import *
 from data_loader import *
-from cosine_exp import *
+from cosine_analysis.cosine_exp import *
 from train import *
 import torchmetrics 
 from sklearn.decomposition import PCA

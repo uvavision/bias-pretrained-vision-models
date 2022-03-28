@@ -47,7 +47,7 @@ sys.path.append(parent)
 from train import *
 from model_init import *
 from data_loader import *
-from cosine_exp import *
+from cosine_analysis.cosine_exp import *
 import yaml
 from sklearn.decomposition import PCA
 
