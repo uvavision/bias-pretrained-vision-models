@@ -61,10 +61,10 @@ import matplotlib.cm as cm
 import datetime
 import plotly.graph_objects as go
 import pandas as pd
-from plot_intra_class import *
-from plot_intra_class_avg import *
-from plot_misc import *
-from plot_misc_avg import *
+from cosine_analysis.plot_intra_class import *
+from cosine_analysis.plot_intra_class_avg import *
+from cosine_analysis.plot_misc import *
+from cosine_analysis.plot_misc_avg import *
 
 fontP = FontProperties()
 fontP.set_size('small')
@@ -273,60 +273,62 @@ def run_experiment(model_name, save_path, train_dataset, dataset_name, features,
     comps = config['COMPS']
 
     NUM_ITER = 50
-    # self_similarities
-    self_similarities_stats_pt = dict() # keys classes_names in config
-    self_similarities_stats_ft = dict()
-
-    self_similarities_stats_pt_significance = dict()
-    self_similarities_stats_ft_significance = dict()
-
-    comps_similarities_stats_pt = dict()
-    comps_similarities_stats_ft = dict()
-
-    comps_similarities_stats_pt_significance = dict()
-    comps_similarities_stats_ft_significance = dict()
-
-    mins_maxes_pt = dict()
-    mins_maxes_comps_pt = dict()
-
-    mins_maxes_ft = dict()
-    mins_maxes_comps_ft = dict()  
-    if pca_comps == 0.0:
-        pca_comps = 'None'
-
-    for feature in features:
-        # generates pretrained and finetuned
-        cos, std, sim_std, sim_mean, t_test = self_similarities(features[feature], NUM_ITER, bias_metric)
-        if feature.endswith("_pt"):
-            self_similarities_stats_pt[labels[feature[:-3]]] = (cos, std, sim_std, sim_mean)
-            self_similarities_stats_pt_significance[labels[feature[:-3]]] = t_test
-            mins_maxes_pt[labels[feature[:-3]]] = self_similarities_error_bars(features[feature], NUM_ITER, bias_metric) # keys are labels_names in config
-        else:
-            self_similarities_stats_ft[labels[feature[:-3]]] = (cos, std, sim_std, sim_mean)
-            self_similarities_stats_ft_significance[labels[feature[:-3]]] = t_test
-            mins_maxes_ft[labels[feature[:-3]]] = self_similarities_error_bars(features[feature], NUM_ITER, bias_metric) # keys are labels_names in config
-
-    for comp in comps:
-        # comps[comp] is a list of comparisons
-        cos, std, sim_std, sim_mean, t_test = similarities_features(features[comps[comp][0]+"_pt"], features[comps[comp][1]+"_pt"], NUM_ITER)        
-        comps_similarities_stats_pt[comp] = (cos, std, sim_std, sim_mean)
-        comps_similarities_stats_pt_significance[comp] = t_test
-
-        errorbars_pt = similarities_features_error_bars(features[comps[comp][0]+"_pt"], features[comps[comp][1]+"_pt"], NUM_ITER)
-        mins_maxes_comps_pt[comp] = errorbars_pt
-        if only_pretrained == False:
-            cos, std, sim_std, sim_mean, t_test = similarities_features(features[comps[comp][0]+"_ft"], features[comps[comp][1]+"_ft"], NUM_ITER)
-            comps_similarities_stats_ft_significance[comp] = t_test
-            comps_similarities_stats_ft[comp] = (cos, std, sim_std, sim_mean)
-            errorbars_ft = similarities_features_error_bars(features[comps[comp][0]+"_ft"], features[comps[comp][1]+"_ft"], NUM_ITER)
-            mins_maxes_comps_ft[comp] = errorbars_ft
-
     if pca_comps == 'None':
         pca_path = 'no_pca/'
     else:
         pca_path = 'pca/'
     
+    individual_plots_cats = config['INDIVIDUAL_PLOTS']['category_list']
+
     if multiple_trials == False:
+        # self_similarities
+        self_similarities_stats_pt = dict() # keys classes_names in config
+        self_similarities_stats_ft = dict()
+
+        self_similarities_stats_pt_significance = dict()
+        self_similarities_stats_ft_significance = dict()
+
+        comps_similarities_stats_pt = dict()
+        comps_similarities_stats_ft = dict()
+
+        comps_similarities_stats_pt_significance = dict()
+        comps_similarities_stats_ft_significance = dict()
+
+        mins_maxes_pt = dict()
+        mins_maxes_comps_pt = dict()
+
+        mins_maxes_ft = dict()
+        mins_maxes_comps_ft = dict()  
+        if pca_comps == 0.0:
+            pca_comps = 'None'
+
+        for feature in features:
+            # generates pretrained and finetuned
+            cos, std, sim_std, sim_mean, t_test = self_similarities(features[feature], NUM_ITER, bias_metric)
+            if feature.endswith("_pt"):
+                self_similarities_stats_pt[labels[feature[:-3]]] = (cos, std, sim_std, sim_mean)
+                self_similarities_stats_pt_significance[labels[feature[:-3]]] = t_test
+                mins_maxes_pt[labels[feature[:-3]]] = self_similarities_error_bars(features[feature], NUM_ITER, bias_metric) # keys are labels_names in config
+            else:
+                self_similarities_stats_ft[labels[feature[:-3]]] = (cos, std, sim_std, sim_mean)
+                self_similarities_stats_ft_significance[labels[feature[:-3]]] = t_test
+                mins_maxes_ft[labels[feature[:-3]]] = self_similarities_error_bars(features[feature], NUM_ITER, bias_metric) # keys are labels_names in config
+
+        for comp in comps:
+            # comps[comp] is a list of comparisons
+            cos, std, sim_std, sim_mean, t_test = similarities_features(features[comps[comp][0]+"_pt"], features[comps[comp][1]+"_pt"], NUM_ITER)        
+            comps_similarities_stats_pt[comp] = (cos, std, sim_std, sim_mean)
+            comps_similarities_stats_pt_significance[comp] = t_test
+
+            errorbars_pt = similarities_features_error_bars(features[comps[comp][0]+"_pt"], features[comps[comp][1]+"_pt"], NUM_ITER)
+            mins_maxes_comps_pt[comp] = errorbars_pt
+            if only_pretrained == False:
+                cos, std, sim_std, sim_mean, t_test = similarities_features(features[comps[comp][0]+"_ft"], features[comps[comp][1]+"_ft"], NUM_ITER)
+                comps_similarities_stats_ft_significance[comp] = t_test
+                comps_similarities_stats_ft[comp] = (cos, std, sim_std, sim_mean)
+                errorbars_ft = similarities_features_error_bars(features[comps[comp][0]+"_ft"], features[comps[comp][1]+"_ft"], NUM_ITER)
+                mins_maxes_comps_ft[comp] = errorbars_ft
+
         np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_pt.npy', self_similarities_stats_pt)
         np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_ft.npy', self_similarities_stats_ft)
         np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/comps_similarities_pt.npy', comps_similarities_stats_pt)
@@ -337,7 +339,6 @@ def run_experiment(model_name, save_path, train_dataset, dataset_name, features,
         np.save(save_path + '/boxplots/' + dataset_name + '/'+ pca_path + bias_metric + '/'+'comps_similarities_pt_significance.npy', comps_similarities_stats_pt_significance)
         np.save(save_path + '/boxplots/' + dataset_name + '/'+ pca_path + bias_metric + '/'+'comps_similarities_ft_significance.npy', comps_similarities_stats_ft_significance)
 
-    individual_plots_cats = config['INDIVIDUAL_PLOTS']['category_list']
     
     if only_pretrained == True:
         for cat in individual_plots_cats:
