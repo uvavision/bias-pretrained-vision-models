@@ -224,8 +224,8 @@ def multiple_trials_exp(model_name, save_path, train_dataset, dataset_name, conf
     all_comps_sim_ft = []
     for i in contents:
         if i != 'orig' and i != '.ipynb_checkpoints' and i != 'averaged':
-            dir = os.listdir(base_path+'/'+i+'/features/' +dataset_name +'/finetuned_features'+'/'+pca_path)
-            if len(dir) != 0:
+            trial = os.listdir(base_path+'/'+i+'/features/' +dataset_name +'/finetuned_features'+'/'+pca_path)
+            if len(trial) != 0:
                 self_similarities_pt = np.load(base_path+'/'+i+'/metric_data/' + dataset_name + '/'+pca_path + bias_metric+'/self_similarities_pt.npy', allow_pickle=True)
                 self_similarities_ft = np.load(base_path+'/'+i+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_ft.npy', allow_pickle=True)
                 comps_similarities_pt = np.load(base_path+'/'+i+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/comps_similarities_pt.npy', allow_pickle=True)
