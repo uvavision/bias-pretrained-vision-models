@@ -45,9 +45,17 @@ import yaml
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.loggers import TensorBoardLogger
 
+from data_loader import *
 
+def setup_dirs(base_path: str, from_scratch=False):
+    """Setups up a directory for a single trial of a model
 
-def setup_dirs(base_path, from_scratch=False):
+    Args:
+        base_path: Path to all the model's trials, for example, if the
+                   model - resnet50 is being trained on - coco, the base
+                   path is: experiments/coco/resnet50/datestring
+        from_scratch: 
+    """
     os.mkdir(base_path+'/'+'metric_data', mode=0o777)
     os.mkdir(base_path+'/'+'metric_data/'+'pca', mode=0o777)
     os.mkdir(base_path+'/'+'metric_data/'+'pca/'+'correlation', mode=0o777)
@@ -116,14 +124,9 @@ def setup_dirs(base_path, from_scratch=False):
         os.mkdir(base_path + '/'+'model_scratch/'+'model', mode=0o777)
         os.mkdir(base_path + '/'+'model_scratch/'+'model/'+'model_updates', mode=0o777)
 
-def load_coco(dataType, dataDir):
-    annFile='{}annotations/instances_{}.json'.format(dataDir,dataType)
-    coco=COCO(annFile)
-    annFile_caps = '{}annotations/captions_{}.json'.format(dataDir,dataType)
-    coco_caps=COCO(annFile_caps)
-    return coco, coco_caps
-
 def setup_dataset(args):
+    """Generates pytorch dataloaders with train and val split for finetuning dataset
+    """
     dataloaders_dict = dict()
     if args.dataset == 'coco':
         if args.model_name == 'clip':

@@ -70,7 +70,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class CLIP_model():
     def __init__(self, args, model_path):
-        model_ft, criterion, optimizer = initialize_model_clip(args.num_classes, args.feature_extract, args.lr, args.momentum, args.optimizer, use_pretrained=True)
+        model_ft, criterion, optimizer = initialize_model_clip(args.num_classes, args.lr, args.momentum, args.optimizer)
         self.model = model_ft
         self.criterion = criterion
         self.optimizer = optimizer

@@ -71,6 +71,15 @@ print("Torch version:", torch.__version__)
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 class Coco(Dataset):
+    """Sets up the COCO 2017 dataset, expects pytorch CocoDetection object as Dataset
+
+    __getitem__ implements standardization and returns image tensor and binary labels
+
+    Attributes:
+        dataset: Pytorch CocoDetection object
+        img_del: Set of image ids to exclude that were included in the analysis set
+        coco_object2id: Zero-indexing objects
+    """
     def __init__(self, data, split='train'):
         self.dataset = data
         if split=='train':
@@ -80,9 +89,19 @@ class Coco(Dataset):
         self.coco_object2id = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7, 9: 8, 10: 9, 11: 10, 13: 11, 14: 12, 15: 13, 16: 14, 17: 15, 18: 16, 19: 17, 20: 18, 21: 19, 22: 20, 23: 21, 24: 22, 25: 23, 27: 24, 28: 25, 31: 26, 32: 27, 33: 28, 34: 29, 35: 30, 36: 31, 37: 32, 38: 33, 39: 34, 40: 35, 41: 36, 42: 37, 43: 38, 44: 39, 46: 40, 47: 41, 48: 42, 49: 43, 50: 44, 51: 45, 52: 46, 53: 47, 54: 48, 55: 49, 56: 50, 57: 51, 58: 52, 59: 53, 60: 54, 61: 55, 62: 56, 63: 57, 64: 58, 65: 59, 67: 60, 70: 61, 72: 62, 73: 63, 74: 64, 75: 65, 76: 66, 77: 67, 78: 68, 79: 69, 80: 70, 81: 71, 82: 72, 84: 73, 85: 74, 86: 75, 87: 76, 88: 77, 89: 78, 90: 79}
 
     def __len__(self):
+        """Returns number of examples in dataset split 
+        """
         return len(self.dataset)
 
     def __getitem__(self, idx):
+        """Returns a sample image and labels
+
+        Args:
+            idx: COCO index of image
+        
+        Returns:
+            sample: Tuple of image tensor and binary labels of size (80,)
+        """
         image_mean = torch.tensor([0.48145466, 0.4578275, 0.40821073])
         image_std = torch.tensor([0.26862954, 0.26130258, 0.27577711])
         
@@ -92,8 +111,8 @@ class Coco(Dataset):
         start = time.time()
         images = self.dataset[idx][0]
         end = time.time()-start
-        with open('coco_times.txt', 'a') as the_file:
-            the_file.write(str(end)+'\n')
+        #with open('coco_times.txt', 'a') as the_file:
+            #the_file.write(str(end)+'\n')
         
         image_input = torch.tensor(np.stack(images))
         image_input -= image_mean[:, None, None]
@@ -275,8 +294,8 @@ class OpenImages(Dataset):
             #start_time = time.time()
             image = self.transform(image)
             end = time.time()-start
-            with open('openimages_times.txt', 'a') as the_file:
-                the_file.write(str(end)+'\n')
+            #with open('openimages_times.txt', 'a') as the_file:
+                #the_file.write(str(end)+'\n')
         
         labels_img = self.box_labels[image_path.stem]
         labels_binary = np.zeros(self.num_classes)

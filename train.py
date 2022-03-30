@@ -81,7 +81,7 @@ def lightning_setup(args):
         print("Model not implemented")
     return model_ft
 
-def lightning_train(args, dataloaders, model_path, resume_training=False):
+def lightning_train(args, dataloaders: dict, model_path: str, resume_training=False):
     """Finetunes a model and saves the metadata in model_path
 
     Args:
@@ -190,7 +190,7 @@ def load_features(folder: str, pca: float, analysis_set: str, only_pretrained=Fa
             features[os.path.splitext(file_name)[0]] = np.load(folder +'/features/'+analysis_set + '/finetuned_features/' + pca_path + file_name, allow_pickle=True)
     return features
 
-def extract_features(args, model_path, only_pretrained, model_ft=None):
+def extract_features(args, model_path: str, only_pretrained: bool, model_ft=None):
     """Generates features for a model and saves them in model_path
 
     Args:
@@ -279,6 +279,7 @@ def main():
     torch.backends.cudnn.benchmark = True
     
     if not args.load_features and not args.extract_cross_analysis_features:
+        # Setup trial directory for a model ... assumes this path already exists: 'experiments/dataset_name/model_name/
         datestring = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if args.finetune:
             os.mkdir('experiments/'+ args.dataset + '/' + args.model_name+'/'+datestring)
@@ -297,6 +298,7 @@ def main():
         features = load_features(args.trial_path, pca=args.pca, analysis_set=args.analysis_set, only_pretrained=False)
         run_experiment(args.model_name, args.trial_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained = False, multiple_trials=args.multiple_trials)
     elif args.extract_cross_analysis_features == True:
+        # Extracts pretrained and finetuned features for a model on an analysis set regardless of what dataset the model was trained on
         print("Extracting features for dataset: "+args.analysis_set)
         model_ft = lightning_setup(args)
         features = extract_features(args, args.trial_path, only_pretrained=False, model_ft=model_ft)
@@ -306,8 +308,8 @@ def main():
         features = extract_features(args, model_path, only_pretrained=True, model_ft=None)
         run_experiment(args.model_name, model_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained=True, multiple_trials=args.multiple_trials)
     else:
+        # Finetune, train the model from scratch or resume training, extract both pretrained and finetuned features and run bias analysis on them
         dataloaders_dict = setup_dataset(args)
-        # Finetune or train the model from scratch, or resume training, extract both pretrained and finetuned features and save them
         model_ft = lightning_train(args, dataloaders_dict, model_path, resume_training=args.resume_training)
         features = extract_features(args, model_path, only_pretrained=False, model_ft=model_ft)
         if args.bias_analysis == True:

@@ -238,20 +238,27 @@ def get_lars_optimizer(models):
 
     return optimizer
 
+def init_weights(m):
+    """Initialize weights with zeros
+    """
+    if type(m) == nn.Linear:
+        m.weight.data.normal_(mean=0.0, std=0.01)
+        m.bias.data.zero_()
 
+def set_parameter_requires_grad(model, feature_extracting: bool):
+    """Sets parameter gradients based on feature_extacting
 
-def set_parameter_requires_grad(model, feature_extracting):
+    Args:
+        model: pytorch model object to update parameters
+        feature_extracting: When false, finetune the whole model, when True, only update the reshaped layer parameters
+    
+    Returns:
+        updated model parameters depending on feature_extracting
+    """
     if feature_extracting:
         for param in model.parameters():
             param.requires_grad = False
     init_weights(model)
-
-def init_weights(m):
-    '''Initialize weights with zeros
-    '''
-    if type(m) == nn.Linear:
-        m.weight.data.normal_(mean=0.0, std=0.01)
-        m.bias.data.zero_()
 
 def load_moco(base_encoder, checkpoint_path):
     """ Loads the pre-trained MoCo model parameters.
@@ -282,7 +289,18 @@ def load_moco(base_encoder, checkpoint_path):
 
     return base_encoder
 
-def load_models_pytorch(model_name, num_classes, use_pretrained):
+def load_models_pytorch(model_name: str, num_classes: int, use_pretrained: bool):
+    """ Loads model into memory and ppdates the last layer of the model according to num_classes
+
+    Args:
+        model_name: Pytorch model to load into memory from torchvision models
+        num_classes: Number of classes in the dataset that the model is being finetuned on
+        use_pretrained: If True, loads the weights of the pretrained version of the model from
+                        torchvision models
+
+    Returns:
+        model_ft: Loaded model with modified last layer
+    """
     model_ft = None
     model_init = dict()
     model_init['resnet18'] = models.resnet18
@@ -332,7 +350,25 @@ def load_models_pytorch(model_name, num_classes, use_pretrained):
         print("Invalid model name, choose from moco_resnet50, resnet18, resnet34, resnet50, resnet101, resnet152, resnext50_32x4d, resnext101_32x8d, wide_resnet50_2, wide_resnet101_2, alexnet, vgg, densenet, googlenet, bit_resnet50, virtex_resnet50")
     return model_ft
 
-def initialize_model_pytorch(model_name, num_classes, feature_extract, lr, momentum, optimizer_name, use_pretrained):
+def initialize_model_pytorch(model_name: str, num_classes: int, feature_extract: bool, lr: float, momentum: float, optimizer_name: str, use_pretrained: bool):
+    """ Sets up model parameters for finetuning
+
+    Args:
+        model_name: Pytorch model to load into memory from torchvision models
+        num_classes: Number of classes in the dataset that the model is being finetuned on
+        feature_extract: When false, finetune the whole model, when True, only update the reshaped layer parameters
+        lr: Float value representing finetuning learning rate
+        momentum: Momentum value for SGD
+        optimizer_name: Name of optimizer --- sgd, adam, adamax, or lars
+        use_pretrained: If true, loads the weights of the pretrained version of the model from
+                        torchvision models
+                        
+    Returns:
+        model_ft: Loaded model with modified last layer
+        criterion: Pytorch BCEWithLogitsLoss
+        optimizer: Pytorch optimizer object
+    """
+
     model_ft = load_models_pytorch(model_name, num_classes, use_pretrained)
     set_parameter_requires_grad(model_ft, feature_extract)
     if model_name == 'alexnet' or model_name == 'vgg':
@@ -341,10 +377,10 @@ def initialize_model_pytorch(model_name, num_classes, feature_extract, lr, momen
     elif model_name != 'bit_resnet50' and model_name != 'moco_resnet50'and model_name != 'simclr_resnet50':
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, num_classes)
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     print(model_ft)
-    model_ft = model_ft.to(device)
+    #model_ft = model_ft.to(device)
     params_to_update = model_ft.parameters()
 
     if feature_extract:
@@ -373,15 +409,26 @@ def initialize_model_pytorch(model_name, num_classes, feature_extract, lr, momen
 
     return model_ft, criterion, optimizer
 
-def initialize_model_clip(num_classes, feature_extract, lr, momentum, optimizer_name, use_pretrained=True):
-    # Initialize these variables which will be set in this if statement. Each of these
-    #   variables is model specific.
+def initialize_model_clip(num_classes, lr, momentum, optimizer_name):
+    """ Sets up CLIP-ViT/B-32 model parameters for finetuning
+
+    Args:
+        num_classes: Number of classes in the dataset that the model is being finetuned on
+        lr: Float value representing finetuning learning rate
+        momentum: Momentum value for SGD
+        optimizer_name: Name of optimizer --- sgd, adam, adamax, or lars
+
+    Returns:
+        model_ft: Loaded model with modified last layer
+        criterion: Pytorch BCEWithLogitsLoss
+        optimizer: Pytorch optimizer object
+    """
     model, preprocess = clip.load("ViT-B/32", jit=False) #Must set jit=False for training
     model = model.cuda()
     model_ft = torch.nn.Sequential(model.visual, torch.nn.Linear(512,num_classes)).cuda()
-    criterion = torch.nn.BCEWithLogitsLoss().cuda() # --> already includes sigmoid 
+    criterion = torch.nn.BCEWithLogitsLoss().cuda() 
     if optimizer_name == 'sgd':
-        optimizer = torch.optim.SGD(model_ft.parameters(), lr=0.01, momentum=0.9)
+        optimizer = torch.optim.SGD(model_ft.parameters(), lr=lr, momentum=momentum) # lr = 0.01, momentum=0.9
     else:
         optimizer = torch.optim.Adam(model_ft.parameters(), lr=5e-5,betas=(0.9,0.98),eps=1e-6,weight_decay=0.2) #Params from paper
     print(model_ft)
