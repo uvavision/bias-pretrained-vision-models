@@ -325,15 +325,9 @@ def load_models_pytorch(model_name, num_classes, use_pretrained):
         virtex.fc = nn.Linear(2048, num_classes)
         model_init['virtex_resnet50'] = virtex
         model_ft = model_init['virtex_resnet50']
-        #print(model_ft)
 
     elif model_name in model_init:
-        #if use_pretrained == True:
         model_ft = model_init[model_name](pretrained=use_pretrained)
-        #else:
-            #model_ft = model_init[model_name](pretrained=use_pretrained, pretrained_backbone=False)
-    #if model_name in model_init:
-        #model_ft = model_init[model_name]
     else:
         print("Invalid model name, choose from moco_resnet50, resnet18, resnet34, resnet50, resnet101, resnet152, resnext50_32x4d, resnext101_32x8d, wide_resnet50_2, wide_resnet101_2, alexnet, vgg, densenet, googlenet, bit_resnet50, virtex_resnet50")
     return model_ft

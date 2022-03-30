@@ -48,6 +48,7 @@ from train import *
 from model_init import *
 from data_loader import *
 from cosine_analysis.cosine_exp import *
+from utils import * 
 import yaml
 from sklearn.decomposition import PCA
 
@@ -60,32 +61,12 @@ from torch.utils.data import DataLoader, random_split
 import pytorch_lightning as pl
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-seed = 420
-random.seed(seed)
-np.random.seed(seed)
-torch.manual_seed(seed)
-torch.cuda.manual_seed(seed)
-torch.cuda.manual_seed_all(seed)
-def readFile(fileName):
-    fileObj = open(fileName, "r") 
-    urls = fileObj.read().splitlines() 
-    fileObj.close()
-    return urls
-
-def analysis_data(config):
-    with open(config, 'r') as f:
-        conf = yaml.safe_load(f)
-    all_analysis_data = dict()
-    analysis_data_names = dict()
-    for category in conf['CLASSES']:
-        all_analysis_data[category.lower()] = dict()
-        for sub_category in conf['CLASSES'][category]:
-            all_analysis_data[category.lower()][sub_category] = readFile(conf['CLASSES'][category][sub_category])
-    for category in conf['CLASSES_NAMES']:
-        analysis_data_names[category.lower()] = dict()
-        for sub_category in conf['CLASSES_NAMES'][category]:
-            analysis_data_names[category.lower()][sub_category] = conf['CLASSES_NAMES'][category][sub_category]
-    return all_analysis_data, analysis_data_names
+# seed = 420
+# random.seed(seed)
+# np.random.seed(seed)
+# torch.manual_seed(seed)
+# torch.cuda.manual_seed(seed)
+# torch.cuda.manual_seed_all(seed)
 
 class CLIP_model():
     def __init__(self, args, model_path):
@@ -226,13 +207,13 @@ class CLIP_model():
         return model, val_acc_history, total_targets
 
 class ClipViTFeatureExtractor():
-    def __init__(self, dataset, model_path, model_name, num_classes, openimages_path=None):
-        self.dataset = dataset
+    def __init__(self, args, model_path):
+        self.dataset = args.analysis_set
         if self.dataset == 'openimages':
-            self.openimages_path = openimages_path+"val/"
+            self.openimages_path = args.openimages_path+"val/"
         self.model_path = model_path
-        self.model_name = model_name
-        self.num_classes = num_classes
+        self.model_name = args.model_name
+        self.num_classes = args.num_classes
 
     def process_images(self, list_imgs):
         preprocess = Compose([
@@ -321,12 +302,13 @@ class ClipViTFeatureExtractor():
             np.save(path + key, feature_transformed) 
         return features_transformed_dict
     
-    def extract_features(self, model_ft=None, dataset_name=None, only_pretrained=False, finetune=True, config=None, pca=None):
+    def extract_features(self, args, model_ft=None, only_pretrained=False):
+        
         save_path = self.model_path+"/"
-        analysis_data_loaded, analysis_data_names = analysis_data(config) # returns a dictionary mapping category[subcategory] = list_imgs
+        analysis_data_loaded, analysis_data_names = analysis_data(args.config_file) # returns a dictionary mapping category[subcategory] = list_imgs
         #surfboard, car, refrigerator, random_loaded, man_background, woman_background, stop_sign = analysis_data(dataset_name, config)
         if only_pretrained == True:
-            print("Building pretrained ViT/Resnet50 features ... ")
+            print("Building pretrained ViT/Resnet50 features ... " + " on analysis set: " + args.analysis_set)
 
             pretrained_features = dict()
             for category in analysis_data_loaded:
@@ -335,12 +317,12 @@ class ClipViTFeatureExtractor():
                     features = self.build_features_pt(analysis_data_loaded[category][subcategory])
                     np.save(save_path+'features/'+self.dataset+"/pretrained_features/no_pca/" + analysis_data_names[category][subcategory] + "_pt.npy", features.cpu().numpy())
                     pretrained_features[analysis_data_names[category][subcategory] + "_pt"] = features
-            if pca != 0.0:
-                print("Computing PCA Analysis with n_components = " + str(pca))
-                pretrained_features = self.pca_analysis(pretrained_features, pca, save_path+self.dataset+"/pretrained_features/pca/")
+            if args.pca != 0.0:
+                print("Computing PCA Analysis with n_components = " + str(args.pca))
+                pretrained_features = self.pca_analysis(pretrained_features, args.pca, save_path+self.dataset+"/pretrained_features/pca/")
             return pretrained_features
         else:
-            print("Building finetuned and pretrained features for ViT/Resnet50 ")
+            print("Building finetuned and pretrained features for ViT/Resnet50" + " on analysis set: " + args.analysis_set)
             all_features = dict()
             all_features_ft = dict()
             all_features_pt = dict()
@@ -356,9 +338,9 @@ class ClipViTFeatureExtractor():
                     np.save(save_path+'features/'+self.dataset+"/pretrained_features/no_pca/" + analysis_data_names[category][subcategory] + "_pt.npy", features_pt.cpu().numpy())
                     all_features[analysis_data_names[category][subcategory] + "_pt"] = features_pt
                     all_features_pt[analysis_data_names[category][subcategory] + "_pt"] = features_pt
-            if pca != 0.0:
-                print("Computing PCA Analysis with n_components = " + str(pca))
-                all_features_ft = self.pca_analysis(all_features_ft, pca, save_path+self.dataset+"/finetuned_features/pca/")
-                all_features_pt = self.pca_analysis(all_features_pt, pca, save_path+self.dataset+"/pretrained_features/pca/")
+            if args.pca != 0.0:
+                print("Computing PCA Analysis with n_components = " + str(args.pca))
+                all_features_ft = self.pca_analysis(all_features_ft, args.pca, save_path+self.dataset+"/finetuned_features/pca/")
+                all_features_pt = self.pca_analysis(all_features_pt, args.pca, save_path+self.dataset+"/pretrained_features/pca/")
                 all_features = all_features_ft.update(all_features_pt)
             return all_features
