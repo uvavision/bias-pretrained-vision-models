@@ -60,15 +60,19 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
 import pytorch_lightning as pl
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# seed = 420
-# random.seed(seed)
-# np.random.seed(seed)
-# torch.manual_seed(seed)
-# torch.cuda.manual_seed(seed)
-# torch.cuda.manual_seed_all(seed)
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class CLIP_model():
+    """Defines the CLIP-Vit/B-32 model training and evaluation. 
+
+    Attributes:
+        model: The initialized pretrained model with the last layer modified to fit the finetuning objective
+        criterion: Loss function to be used during finetuning: set to BCEWithLogitsLoss()
+        optimizer: Pytorch optimizer to use during finetuning: sgd, adamax, lars, adam
+        dataset: Dataset to finetune on: coco or openimages
+        model_path: Path to model trial: ex. 'experiments/coco/bit_resnet50/2022-01-15 14:18:21'
+    """
+
     def __init__(self, args, model_path):
         model_ft, criterion, optimizer = initialize_model_clip(args.num_classes, args.lr, args.momentum, args.optimizer)
         self.model = model_ft
@@ -80,13 +84,14 @@ class CLIP_model():
     def setup_model(self):
         return self.model, self.criterion, self.optimizer
 
-    def convert_models_to_fp32(self, model): 
+    def convert_models_to_fp32(self, model):
+        """ Converts model parameters to floating point for training"""
         for p in model.parameters(): 
             p.data = p.data.float() 
             p.grad.data = p.grad.data.float() 
             
     def convert_weights(self, model):
-        """Convert applicable model parameters to fp16"""
+        """Convert applicable model parameters to fp16 for mixed precision training"""
 
         def _convert_weights_to_fp16(l):
             if isinstance(l, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Linear)):
@@ -108,7 +113,8 @@ class CLIP_model():
 
         model.apply(_convert_weights_to_fp16)
 
-    def train_model(self, model_name,  dataset_name,  model, dataloaders, criterion, optimizer, num_epochs=25, scheduler='none'):
+    def train_model(self, dataset_name, model, dataloaders, criterion, optimizer, num_epochs=25):
+        """Performs finetuning and evaluation on ViT/B-32 model"""
         since = time.time()
 
         scaler = torch.cuda.amp.GradScaler()
@@ -153,6 +159,7 @@ class CLIP_model():
                         else:
                             res.append((preds.data.cpu(), labels.data.cpu())) 
                         if dataset_name == 'openimages':
+                            # The openimages dataset is so large that the metrics need to be aggregated every x number of steps
                             if i % 70000 == 0:
                                 total_preds = torch.cat([entry[0] for entry in res], 0) 
                                 total_targets = torch.cat([entry[1] for entry in res], 0)
@@ -207,15 +214,22 @@ class CLIP_model():
         return model, val_acc_history, total_targets
 
 class ClipViTFeatureExtractor():
+    """Defines preprocesssing of analysis set and feature extraction for CLIP-ViT/B-32
+
+    Attributes:
+        dataset: The dataset used to extract features on --> analysis set
+        model_path: Path to model trial that defines where to save the features: ex. 'experiments/coco/bit_resnet50/2022-01-15 14:18:21'
+       
+    """
+
     def __init__(self, args, model_path):
         self.dataset = args.analysis_set
         if self.dataset == 'openimages':
             self.openimages_path = args.openimages_path+"val/"
         self.model_path = model_path
-        self.model_name = args.model_name
-        self.num_classes = args.num_classes
 
     def process_images(self, list_imgs):
+        """Preprocesses a list of tensor images using standard transformations for CLIP-ViT/B-32"""
         preprocess = Compose([
             Resize(224, interpolation=Image.BICUBIC),
             CenterCrop(224),
@@ -232,7 +246,8 @@ class ClipViTFeatureExtractor():
             images.append(image) 
         return images
 
-    def extract_features_clip_ft(self, images, model_ft, normalize='norm_one'): 
+    def extract_features_clip_ft(self, images, model_ft, normalize='norm_one'):
+        """Extracts features for CLIP-ViT/B-32 after it has been finetuned"""
         image_mean = torch.tensor([0.48145466, 0.4578275, 0.40821073]).cuda()
         image_std = torch.tensor([0.26862954, 0.26130258, 0.27577711]).cuda()
         new_classifier = torch.nn.Sequential(*list(model_ft.children())[:-1])
@@ -251,6 +266,7 @@ class ClipViTFeatureExtractor():
         return torch.tensor(image_features)
 
     def extract_features_clip_pt(self, images, model, normalize='norm_one'): 
+        """Extracts features for CLIP-ViT/B-32 using the pretrained off-the-shelf version"""
         image_mean = torch.tensor([0.48145466, 0.4578275, 0.40821073]).cuda()
         image_std = torch.tensor([0.26862954, 0.26130258, 0.27577711]).cuda()
         image_input = torch.tensor(np.stack(images)).cuda()
@@ -279,6 +295,7 @@ class ClipViTFeatureExtractor():
         return features
     
     def pca_analysis(self, features, pca_comps, path):
+        """Performs PCA analysis on the features after they have been extracted"""
         feature_list = list(features.values())
         feature_list = [i.cpu().numpy() for i in feature_list]
         all_images_sizes = []
@@ -303,10 +320,9 @@ class ClipViTFeatureExtractor():
         return features_transformed_dict
     
     def extract_features(self, args, model_ft=None, only_pretrained=False):
-        
+        """Extracts and saves the features in model_path"""
         save_path = self.model_path+"/"
         analysis_data_loaded, analysis_data_names = analysis_data(args.config_file) # returns a dictionary mapping category[subcategory] = list_imgs
-        #surfboard, car, refrigerator, random_loaded, man_background, woman_background, stop_sign = analysis_data(dataset_name, config)
         if only_pretrained == True:
             print("Building pretrained ViT/Resnet50 features ... " + " on analysis set: " + args.analysis_set)
 

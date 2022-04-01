@@ -81,7 +81,7 @@ def lightning_setup(args):
         print("Model not implemented")
     return model_ft
 
-def lightning_train(args, dataloaders: dict, model_path: str, resume_training=False):
+def lightning_train(args, dataloaders: dict, model_path: str, resume_training: bool = False):
     """Finetunes a model and saves the metadata in model_path
 
     Args:
@@ -106,7 +106,7 @@ def lightning_train(args, dataloaders: dict, model_path: str, resume_training=Fa
             checkpoint = torch.load(model_path+'/model/model.pt')
             model_ft.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-            model_ft, _, _ = model_setup.train_model(args.model_name, args.dataset, model_ft, dataloaders, criterion, optimizer, num_epochs=args.epochs, scheduler=args.lr_scheduler)
+            model_ft, _, _ = model_setup.train_model(args.dataset, model_ft, dataloaders, criterion, optimizer, num_epochs=args.epochs)
             model_ft.eval()
             torch.save(model_ft.state_dict(), model_path+'/model/model_final.pt')
         elif args.model_name in models_implemented:
@@ -132,7 +132,7 @@ def lightning_train(args, dataloaders: dict, model_path: str, resume_training=Fa
         if args.model_name == 'clip': 
             model_setup = CLIP_model(args, model_path)
             model_ft, criterion, optimizer = model_setup.setup_model()
-            model_ft, _, _ = model_setup.train_model(args.model_name, args.dataset, model_ft, dataloaders, criterion, optimizer, num_epochs=args.epochs, scheduler=args.lr_scheduler)
+            model_ft, _, _ = model_setup.train_model(args.dataset, model_ft, dataloaders, criterion, optimizer, num_epochs=args.epochs)
             model_ft.eval()
         elif args.model_name in models_implemented:
             # call model's Lightning module trainer, train and return model_ft
@@ -157,7 +157,7 @@ def lightning_train(args, dataloaders: dict, model_path: str, resume_training=Fa
     return model_ft
 
 
-def load_features(folder: str, pca: float, analysis_set: str, only_pretrained=False):
+def load_features(folder: str, pca: float, analysis_set: str, only_pretrained: bool = False):
     """Loads generated features for an analysis set from a trained model 
 
     Args:

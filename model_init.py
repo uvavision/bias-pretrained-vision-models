@@ -403,13 +403,13 @@ def initialize_model_pytorch(model_name: str, num_classes: int, feature_extract:
     elif optimizer_name == 'lars':
         optimizer = get_lars_optimizer((model_ft,))
     else:
-        optimizer = torch.optim.Adam(params_to_update, lr=lr, betas=(0.9,0.98),eps=1e-6,weight_decay=1e-6) #Params from paper
+        optimizer = torch.optim.Adam(params_to_update, lr=lr, betas=(0.9,0.98),eps=1e-6,weight_decay=1e-6)
     # Setup the loss fxn
     criterion = nn.BCEWithLogitsLoss()
 
     return model_ft, criterion, optimizer
 
-def initialize_model_clip(num_classes, lr, momentum, optimizer_name):
+def initialize_model_clip(num_classes: int, lr: float, momentum: float, optimizer_name: str):
     """ Sets up CLIP-ViT/B-32 model parameters for finetuning
 
     Args:
@@ -428,8 +428,13 @@ def initialize_model_clip(num_classes, lr, momentum, optimizer_name):
     model_ft = torch.nn.Sequential(model.visual, torch.nn.Linear(512,num_classes)).cuda()
     criterion = torch.nn.BCEWithLogitsLoss().cuda() 
     if optimizer_name == 'sgd':
-        optimizer = torch.optim.SGD(model_ft.parameters(), lr=lr, momentum=momentum) # lr = 0.01, momentum=0.9
+        optimizer = optim.SGD(model_ft.parameters(), lr=lr, momentum=momentum)
+    elif optimizer_name=='adamax':
+        optimizer = optim.Adamax(model_ft.parameters(), lr=lr)
+    elif optimizer_name == 'lars':
+        optimizer = get_lars_optimizer((model_ft,))
     else:
-        optimizer = torch.optim.Adam(model_ft.parameters(), lr=5e-5,betas=(0.9,0.98),eps=1e-6,weight_decay=0.2) #Params from paper
+        optimizer = torch.optim.Adam(model_ft.parameters(), lr=lr, betas=(0.9,0.98),eps=1e-6,weight_decay=1e-6)
+
     print(model_ft)
     return model_ft, criterion, optimizer

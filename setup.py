@@ -47,7 +47,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 
 from data_loader import *
 
-def setup_dirs(base_path: str, from_scratch=False):
+def setup_dirs(base_path: str, from_scratch: bool = False):
     """Setups up a directory for a single trial of a model
 
     Args:

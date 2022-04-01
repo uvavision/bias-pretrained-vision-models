@@ -54,17 +54,19 @@ from sklearn.decomposition import PCA
 import pytorch_lightning as pl
 from utils import *
 
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#seed = 1234
-#random.seed(seed)
-#np.random.seed(seed)
-#torch.manual_seed(seed)
-#torch.cuda.manual_seed(seed)
-#torch.cuda.manual_seed_all(seed)
-#seed_everything(seed, workers=True)
-
 class LitPytorchModels(pl.LightningModule):
+    """Pytorch Lightning module for training models from torchvision
+
+    Attributes:
+        model: The initialized pretrained model with the last layer modified to fit the finetuning objective
+        criterion: Loss function to be used during finetuning: set to BCEWithLogitsLoss()
+        optimizer: Pytorch optimizer to use during finetuning: sgd, adamax, lars, adam
+        model_name: Name of model to be finetuned
+        dataset: Dataset to finetune on: coco or openimages
+        scheduler: Learning rate scheduler: cosine, reduce, or none
+        model_path: Path to model trial: ex. 'experiments/coco/bit_resnet50/2022-01-15 14:18:21'
+
+    """
     def __init__(self, args, model_path):
         super().__init__()
         model_ft, criterion, optimizer = initialize_model_pytorch(args.model_name, args.num_classes, args.feature_extract, args.lr, args.momentum, args.optimizer, use_pretrained=args.finetune)
@@ -72,7 +74,6 @@ class LitPytorchModels(pl.LightningModule):
         self.criterion = criterion
         self.optimizer = optimizer
         self.model_name =  args.model_name
-        self.num_classes = args.num_classes
         self.dataset = args.dataset
 
         if args.lr_scheduler == 'cosine':
@@ -104,7 +105,6 @@ class LitPytorchModels(pl.LightningModule):
         if self.scheduler == None:
             return self.optimizer
         else:
-            #return [self.optimizer], [self.scheduler]
             return {"optimizer": self.optimizer, "lr_scheduler": self.lr_scheduler_config}
     
     def training_step(self, batch, batch_idx):
@@ -216,6 +216,16 @@ class LitPytorchModels(pl.LightningModule):
         #return epoch_dictionary
 
 class PytorchFeatureExtractor():
+    """Defines preprocesssing of analysis set and feature extraction for models from torchvision
+
+    Attributes:
+        dataset: The dataset used to extract features on --> analysis set
+        model_path: Path to model trial that defines where to save the features: ex. 'experiments/coco/bit_resnet50/2022-01-15 14:18:21'
+        model_name: Name of model to perform feature extraction on 
+        num_classes: Number of classes in dataset 
+       
+    """
+
     def __init__(self, args, model_path):
         self.dataset = args.analysis_set
         if self.dataset == 'openimages':
@@ -225,7 +235,8 @@ class PytorchFeatureExtractor():
         self.num_classes = args.num_classes
         
 
-    def process_imgs(self, directory):
+    def process_imgs(self, directory: list):
+        """Preprocesses a list of tensor images using standard transformations"""
         preprocess = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
@@ -244,10 +255,10 @@ class PytorchFeatureExtractor():
             images_stacked.append(input_tensor)
         return torch.tensor(torch.stack(images_stacked,0))
 
-    def extract_features_resnet(self, model, directory, norm="norm_one"):
+    def extract_features(self, model, directory: list, norm="norm_one"):
+        """Preprocesses batch of images and extracts features from the penultimate layer of the model"""
         features_dir = [] # batch x 16 x 2048
         images_processed = self.process_imgs(directory)
-        #print("processed: ", images_processed.shape)
         imgs_split = torch.split(images_processed, 16)
         for input_batch in imgs_split:
             # input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model
@@ -257,7 +268,6 @@ class PytorchFeatureExtractor():
             with torch.no_grad():
                 output = model(input_batch)
                 output = torch.squeeze(output)
-                #output = torch.squeeze(output)
                 if input_batch.shape[0] == 1:
                     output = torch.unsqueeze(output, 0)
                 features_dir.append(output)
@@ -270,40 +280,38 @@ class PytorchFeatureExtractor():
         return torch.tensor(features)
 
 
-    def build_features_pt(self, images):
+    def build_features_pt(self, images: list):
+        """Extracts features for model using the pretrained off-the-shelf version from torchvision"""
         model_loaded = load_models_pytorch(self.model_name, self.num_classes, True)
         if self.model_name != 'bit_resnet50':
             modules=list(model_loaded.children())[:-1]
             resnet_model=nn.Sequential(*modules)
             for p in resnet_model.parameters():
                 p.requires_grad = False
-            features = self.extract_features_resnet(resnet_model, images)
+            features = self.extract_features(resnet_model, images)
         else:
             if self.model_name == 'bit_resnet50':
                 model_loaded.head = model_loaded.head[:-1]
-                features = self.extract_features_resnet(model_loaded, images)
-            #elif self.model_name == 'simclr_resnet50':
-                #features = self.extract_features_resnet(model_loaded[0], images)
+                features = self.extract_features(model_loaded, images)
         return features
 
-    def build_features_ft(self, model_ft, images):
+    def build_features_ft(self, model_ft, images: list):
+        """Extracts features for model after it has been finetuned"""
         if self.model_name != 'bit_resnet50':
             modules=list(model_ft.children())[:-1]
             resnet_model=nn.Sequential(*modules)
             for p in resnet_model.parameters():
                 p.requires_grad = False
-            features = self.extract_features_resnet(resnet_model, images)
+            features = self.extract_features(resnet_model, images)
         else:
             if self.model_name == 'bit_resnet50':
                 temp_model = copy.deepcopy(model_ft)
                 temp_model.head = temp_model.head[:-1]
-                features = self.extract_features_resnet(temp_model, images)
-            #elif self.model_name == 'simclr_resnet50':
-                #temp_model = copy.deepcopy(model_ft[0])
-                #features = self.extract_features_resnet(temp_model, images)
+                features = self.extract_features(temp_model, images)
         return features
     
-    def pca_analysis(self, features, pca_comps, path):
+    def pca_analysis(self, features, pca_comps: float, path: str):
+        """Performs PCA analysis on the features after they have been extracted"""
         feature_list = list(features.values())
         feature_list = [i.cpu().numpy() for i in feature_list]
         all_images_sizes = []
@@ -328,9 +336,9 @@ class PytorchFeatureExtractor():
         return features_transformed_dict
          
 
-    def extract_features(self, args, model_ft=None, only_pretrained=False):
+    def extract_features(self, args, model_ft=None, only_pretrained: bool = False):
+        """Extracts and saves the features in model_path"""
         save_path = self.model_path+'/'
-        #surfboard, car, refrigerator, random_loaded, man_background, woman_background, stop_sign = analysis_data(dataset_name, config)
         analysis_data_loaded, analysis_data_names = analysis_data(args.config_file) # returns a dictionary mapping category[subcategory] = list_imgs
         if only_pretrained == True:
             print("Building pretrained features for ... " + self.model_name + " on analysis set: " + args.analysis_set)
