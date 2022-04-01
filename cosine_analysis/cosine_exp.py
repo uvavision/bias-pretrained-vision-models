@@ -65,19 +65,43 @@ from cosine_analysis.plot_intra_class import *
 from cosine_analysis.plot_intra_class_avg import *
 from cosine_analysis.plot_misc import *
 from cosine_analysis.plot_misc_avg import *
-
+from utils import * 
 fontP = FontProperties()
 fontP.set_size('small')
 
 def cosine_similarity_function(a, b):
+    """Computes pairwise cosine similarity between two vectors
+    
+    Args:
+        a: Vector of size N x d where N is the batch size and d is the dimensionality
+        b: Vector of size N x d where N is the batch size and d is the dimensionality
+    
+    Returns mean and standard deviation of pairwise cosine similarity
+    """
     similarity = cosine_similarity(a, b)
     return np.mean(similarity), np.std(similarity)
 
 def euclidean_function(a, b):
+    """Computes pairwise euclidean distance between two vectors
+    
+    Args:
+        a: Vector of size N x d where N is the batch size and d is the dimensionality
+        b: Vector of size N x d where N is the batch size and d is the dimensionality
+    
+    Returns mean and standard deviation of pairwise euclidean distance
+    """
     distance = euclidean_distances(a, b)
     return np.mean(distance), np.std(distance)
 
 def distance_correlation_function(a, b):
+    """Computes distance correlation between two vectors
+    
+    Args:
+        a: Vector of size N x d where N is the batch size and d is the dimensionality
+        b: Vector of size N x d where N is the batch size and d is the dimensionality
+    
+    Returns mean and standard deviation of pairwise distace correlation 
+    """
     if a.shape[0] != b.shape[0]:
         if a.shape[0] < b.shape[0]:
             b = b[1:]
@@ -87,6 +111,14 @@ def distance_correlation_function(a, b):
     return np.mean(distance), np.std(distance)
 
 def split_features(features, bias_metric):
+    """Calculates intra-class similarity for a set of features by randomly permuting and splitting
+    
+    Args:
+        features: Tensor of features of shape: N x d where N is the number of examples and d is dimensionality
+        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
+    
+    Returns mean and standard deviation of bias metric
+    """
     try:
         np_features = features.cpu().numpy()
     except:
@@ -105,6 +137,14 @@ def split_features(features, bias_metric):
     return similarity, standard_deviation
 
 def random_split_two_features(features_one, features_two):
+    """Calculates inter-class similarity for a set of two features
+    
+    Args:
+        features_one: Tensor of features of shape: N x d where N is the number of examples and d is dimensionality
+        features_two: Tensor of features of shape: M x d where M is the number of examples and d is dimensionality
+    
+    Returns mean and standard deviation of bias metric between two classes
+    """
     try:
         np_features_one = features_one.cpu().numpy()
         np_features_two = features_two.cpu().numpy()
@@ -120,8 +160,22 @@ def random_split_two_features(features_one, features_two):
     similarity, standard_deviation = cosine_similarity_function(random_one, random_two)
     return similarity, standard_deviation 
 
-def similarities_features(features_one, features_two, num_iter):
-    # computes similarities between two features by randomly permuting them
+def inter_class_similarity(features_one, features_two, num_iter):
+    """Calculates inter-class similarity for a set of two features corresponding to separate classes
+    
+    Args:
+        features_one: Tensor of features of shape: N x d where N is the number of examples and d is dimensionality
+        features_two: Tensor of features of shape: M x d where M is the number of examples and d is dimensionality
+        num_iter: Integer specifying number of iterations to compute the bias metric for, set to 50
+    
+    Returns:
+        cosine_similarities: List (length=num_iters) of cosine similarities from each iteration of running inter-class similarity
+        standard_deviations: List (length=num_iters) of standard deviation of pairwise cosine similarity for each iteration
+        std_similarity: Float defining standard deviation of cosine_similarities
+        mean_similarity: Float defining mean of cosine_similarities
+        t_test: T_test results on cosine_similarities
+
+    """
     cosine_similarities = []
     standard_deviations = []
     for i in range(num_iter):
@@ -141,8 +195,22 @@ def similarities_features(features_one, features_two, num_iter):
     
     return cosine_similarities, standard_deviations, std_similarity, mean_similarity, t_test
 
-def self_similarities(features, num_iter, bias_metric):
-    # computes similarities between one set of features split in half
+def intra_class_similarity(features, num_iter, bias_metric):
+    """Calculates intra-class similarity for single set of features corresponding to one class
+    
+    Args:
+        features: Tensor of features of shape: N x d where N is the number of examples and d is dimensionality
+        num_iter: Integer specifying number of iterations to compute the bias metric for, set to 50
+        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
+    
+    Returns:
+        cosine_similarities: List (length=num_iters) of cosine similarities from each iteration of running inter-class similarity
+        standard_deviations: List (length=num_iters) of standard deviation of pairwise cosine similarity for each iteration
+        std_similarity: Float defining standard deviation of cosine_similarities
+        mean_similarity: Float defining mean of cosine_similarities
+        t_test: T_test results on cosine_similarities
+
+    """
     cosine_similarities = []
     standard_deviations = []
     for i in range(num_iter):
@@ -161,8 +229,17 @@ def self_similarities(features, num_iter, bias_metric):
     return cosine_similarities, standard_deviations, std_similarity, mean_similarity, t_test
 
 
-def self_similarities_error_bars(features, num_iter, bias_metric):
-    # computes similarities between one set of features split in half
+def intra_class_similarity_error_bars(features, num_iter, bias_metric):
+    """Calculates error bars for intra-class similarity for single set of features corresponding to one class
+    
+    Args:
+        features: Tensor of features of shape: N x d where N is the number of examples and d is dimensionality
+        num_iter: Integer specifying number of iterations to compute the bias metric for, set to 50
+        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
+    
+    Returns a list of the min and max of the cosine similarities 
+
+    """
     cosine_similarities = []
     standard_deviations = []
     for i in range(num_iter):
@@ -174,8 +251,18 @@ def self_similarities_error_bars(features, num_iter, bias_metric):
     return [min(cosine_similarities), max(cosine_similarities)]
 
 
-def similarities_features_error_bars(features_one, features_two, num_iter):
-    # computes similarities between two sets of features by randomly permuting them
+def inter_class_similarity_error_bars(features_one, features_two, num_iter):
+    """Calculates error bars for inter-class similarity for a set of two features corresponding to separate classes
+    
+    Args:
+        features_one: Tensor of features of shape: N x d where N is the number of examples and d is dimensionality
+        features_two: Tensor of features of shape: M x d where M is the number of examples and d is dimensionality
+        num_iter: Integer specifying number of iterations to compute the bias metric for, set to 50
+    
+    Returns a list of the min and max of the cosine similarities 
+
+    """
+
     cosine_similarities = []
     standard_deviations = []
     for i in range(num_iter):
@@ -188,29 +275,20 @@ def similarities_features_error_bars(features_one, features_two, num_iter):
     mean_similarity = np.mean(cosine_similarities)
     
     return [min(cosine_similarities), max(cosine_similarities)]
-
-
-def load_features(folder, dataset_name, pca_comps, pretrained=False):
-    if pca_comps == 'None':
-        pca_path = 'no_pca/'
-    else:
-        pca_path = 'pca/'
-    if pretrained == True:
-        features = dict()
-        features_pt = os.listdir(folder+'features/' + dataset_name + '/pretrained_features/'+pca_path)
-        for file_name in features_pt:
-            features[os.path.splitext(file_name)[0]] = np.load(folder + 'features/' + dataset_name +'/pretrained_features/'+pca_path + file_name, allow_pickle=True)
-    else:
-        features = dict()
-        features_pt = os.listdir(folder+'features/' + dataset_name +'/pretrained_features/'+pca_path)
-        features_ft = os.listdir(folder+'features/' + dataset_name +'/finetuned_features/'+pca_path)
-        for file_name in features_pt:
-            features[os.path.splitext(file_name)[0]] = np.load(folder + 'features/' + dataset_name +'/pretrained_features/'+ pca_path + file_name, allow_pickle=True)
-        for file_name in features_ft:
-            features[os.path.splitext(file_name)[0]] = np.load(folder + 'features/' + dataset_name +'/finetuned_features/'+ pca_path + file_name, allow_pickle=True)
-    return features
 
 def multiple_trials_exp(model_name, save_path, train_dataset, dataset_name, config_path, bias_metric, pca_comps):
+    """Averages intra-class and inter-class similarity across all trial runs for a model and plots/saves the resulting plots
+    
+    Args:
+        model_name: Name of model to perform bias metric experiment on
+        save_path: Path to save averaged results, ex. 'experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'
+        train_dataset: Dataset the model has originally been trained on
+        dataset_name: Analysis set
+        config_path: Path to config file for analysis set
+        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
+        pca_comps: Whether to perform averaging on features that have been transformed with PCA
+
+    """
     if pca_comps == 'None':
         pca_path = 'no_pca/'
     else:
@@ -267,6 +345,21 @@ def multiple_trials_exp(model_name, save_path, train_dataset, dataset_name, conf
 
 
 def run_experiment(model_name, save_path, train_dataset, dataset_name, features, config_path, bias_metric, pca_comps, only_pretrained=False, multiple_trials=False):
+    """Runs the bias analysis experiment on a model trial
+    
+    Args:
+        model_name: Name of model to perform bias metric experiment on
+        save_path: Path to save bias analysis experiment results
+        train_dataset: Dataset the model has originally been trained on
+        dataset_name: Analysis set
+        features: Dictionary mapping class name to feature tensor of size N x d where N is the number of examples in the clasz
+        config_path: Path to config file for analysis set
+        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
+        pca_comps: Whether to perform averaging on features that have been transformed with PCA
+        only_pretrained: If True, only performs experiment on features that have been extracted from pretrained version of the model
+        multiple_trials: If True, performs bias analysis experiment across all trial runs for a given model 
+        
+    """
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
     labels = config['LABELS_NAMES']
@@ -304,29 +397,29 @@ def run_experiment(model_name, save_path, train_dataset, dataset_name, features,
 
         for feature in features:
             # generates pretrained and finetuned
-            cos, std, sim_std, sim_mean, t_test = self_similarities(features[feature], NUM_ITER, bias_metric)
+            cos, std, sim_std, sim_mean, t_test = intra_class_similarity(features[feature], NUM_ITER, bias_metric)
             if feature.endswith("_pt"):
                 self_similarities_stats_pt[labels[feature[:-3]]] = (cos, std, sim_std, sim_mean)
                 self_similarities_stats_pt_significance[labels[feature[:-3]]] = t_test
-                mins_maxes_pt[labels[feature[:-3]]] = self_similarities_error_bars(features[feature], NUM_ITER, bias_metric) # keys are labels_names in config
+                mins_maxes_pt[labels[feature[:-3]]] = intra_class_similarity_error_bars(features[feature], NUM_ITER, bias_metric) # keys are labels_names in config
             else:
                 self_similarities_stats_ft[labels[feature[:-3]]] = (cos, std, sim_std, sim_mean)
                 self_similarities_stats_ft_significance[labels[feature[:-3]]] = t_test
-                mins_maxes_ft[labels[feature[:-3]]] = self_similarities_error_bars(features[feature], NUM_ITER, bias_metric) # keys are labels_names in config
+                mins_maxes_ft[labels[feature[:-3]]] = intra_class_similarity_error_bars(features[feature], NUM_ITER, bias_metric) # keys are labels_names in config
 
         for comp in comps:
             # comps[comp] is a list of comparisons
-            cos, std, sim_std, sim_mean, t_test = similarities_features(features[comps[comp][0]+"_pt"], features[comps[comp][1]+"_pt"], NUM_ITER)        
+            cos, std, sim_std, sim_mean, t_test = inter_class_similarity(features[comps[comp][0]+"_pt"], features[comps[comp][1]+"_pt"], NUM_ITER)        
             comps_similarities_stats_pt[comp] = (cos, std, sim_std, sim_mean)
             comps_similarities_stats_pt_significance[comp] = t_test
 
-            errorbars_pt = similarities_features_error_bars(features[comps[comp][0]+"_pt"], features[comps[comp][1]+"_pt"], NUM_ITER)
+            errorbars_pt = inter_class_similarity_error_bars(features[comps[comp][0]+"_pt"], features[comps[comp][1]+"_pt"], NUM_ITER)
             mins_maxes_comps_pt[comp] = errorbars_pt
             if only_pretrained == False:
-                cos, std, sim_std, sim_mean, t_test = similarities_features(features[comps[comp][0]+"_ft"], features[comps[comp][1]+"_ft"], NUM_ITER)
+                cos, std, sim_std, sim_mean, t_test = inter_class_similarity(features[comps[comp][0]+"_ft"], features[comps[comp][1]+"_ft"], NUM_ITER)
                 comps_similarities_stats_ft_significance[comp] = t_test
                 comps_similarities_stats_ft[comp] = (cos, std, sim_std, sim_mean)
-                errorbars_ft = similarities_features_error_bars(features[comps[comp][0]+"_ft"], features[comps[comp][1]+"_ft"], NUM_ITER)
+                errorbars_ft = inter_class_similarity_error_bars(features[comps[comp][0]+"_ft"], features[comps[comp][1]+"_ft"], NUM_ITER)
                 mins_maxes_comps_ft[comp] = errorbars_ft
 
         np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_pt.npy', self_similarities_stats_pt)

@@ -87,3 +87,38 @@ def analysis_data(config: str):
         for sub_category in conf['CLASSES_NAMES'][category]:
             analysis_data_names[category.lower()][sub_category] = conf['CLASSES_NAMES'][category][sub_category]
     return all_analysis_data, analysis_data_names
+
+
+
+def load_features(folder: str, pca: float, analysis_set: str, only_pretrained: bool = False):
+    """Loads generated features for an analysis set from a trained model 
+
+    Args:
+        folder: Path to model trial from which to load features
+        pca: Specifies whether the features were computed with pca, 0.0 indicates without pca
+        analysis_set: Specifies which analysis set the features were computed on
+        only_pretraied: When False, returns features generated from the pretrained and finetuned model
+    
+    Returns:
+        features: A dictionary mapping class name (specified in config file of analysis_set) to a tensor 
+                  of features of size N x d where N is the number of examples in a class and is the dimension
+                  size of the model
+    """
+    if pca==0.0:
+        pca_path = 'no_pca/'
+    else:
+        pca_path = 'pca/'
+    if only_pretrained == True:
+        features = dict()
+        features_pt = os.listdir(folder+'/features/'+analysis_set + '/pretrained_features/'+pca_path)
+        for file_name in features_pt:
+            features[os.path.splitext(file_name)[0]] = np.load(folder + '/features/' + analysis_set + '/pretrained_features/'+pca_path + file_name, allow_pickle=True)
+    else:
+        features = dict()
+        features_pt = os.listdir(folder+'/features/'+analysis_set +'/pretrained_features/'+pca_path)
+        features_ft = os.listdir(folder+'/features/'+analysis_set +'/finetuned_features/'+pca_path)
+        for file_name in features_pt:
+            features[os.path.splitext(file_name)[0]] = np.load(folder +'/features/'+analysis_set + '/pretrained_features/' + pca_path + file_name, allow_pickle=True)
+        for file_name in features_ft:
+            features[os.path.splitext(file_name)[0]] = np.load(folder +'/features/'+analysis_set + '/finetuned_features/' + pca_path + file_name, allow_pickle=True)
+    return features

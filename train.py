@@ -47,6 +47,7 @@ from cosine_analysis.cosine_exp import *
 from models_def.pytorch_models import *
 from models_def.clip_model import *
 from setup import * 
+from utils import *
 import yaml
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -155,40 +156,6 @@ def lightning_train(args, dataloaders: dict, model_path: str, resume_training: b
         else:
             print("Model not implemented")
     return model_ft
-
-
-def load_features(folder: str, pca: float, analysis_set: str, only_pretrained: bool = False):
-    """Loads generated features for an analysis set from a trained model 
-
-    Args:
-        folder: Path to model trial from which to load features
-        pca: Specifies whether the features were computed with pca, 0.0 indicates without pca
-        analysis_set: Specifies which analysis set the features were computed on
-        only_pretraied: When False, returns features generated from the pretrained and finetuned model
-    
-    Returns:
-        features: A dictionary mapping class name (specified in config file of analysis_set) to a tensor 
-                  of features of size N x d where N is the number of examples in a class and is the dimension
-                  size of the model
-    """
-    if pca==0.0:
-        pca_path = 'no_pca/'
-    else:
-        pca_path = 'pca/'
-    if only_pretrained == True:
-        features = dict()
-        features_pt = os.listdir(folder+'/features/'+analysis_set + '/pretrained_features/'+pca_path)
-        for file_name in features_pt:
-            features[os.path.splitext(file_name)[0]] = np.load(folder + '/features/' + analysis_set + '/pretrained_features/'+pca_path + file_name, allow_pickle=True)
-    else:
-        features = dict()
-        features_pt = os.listdir(folder+'/features/'+analysis_set +'/pretrained_features/'+pca_path)
-        features_ft = os.listdir(folder+'/features/'+analysis_set +'/finetuned_features/'+pca_path)
-        for file_name in features_pt:
-            features[os.path.splitext(file_name)[0]] = np.load(folder +'/features/'+analysis_set + '/pretrained_features/' + pca_path + file_name, allow_pickle=True)
-        for file_name in features_ft:
-            features[os.path.splitext(file_name)[0]] = np.load(folder +'/features/'+analysis_set + '/finetuned_features/' + pca_path + file_name, allow_pickle=True)
-    return features
 
 def extract_features(args, model_path: str, only_pretrained: bool, model_ft=None):
     """Generates features for a model and saves them in model_path

@@ -64,7 +64,47 @@ import pandas as pd
 
 fontP = FontProperties()
 fontP.set_size('small')
+
 def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_stats, comps_stats_ft, self_similarities_stats, self_similarities_stats_ft, category_features, plot_type, bias_metric, pca_comps):
+    """Plots bias analysis experiment results for different subset of classes
+    'Indiv': single classes --> man, woman, surfboard, car, refrigerator, etc. (intra-class)
+    'Pairs': multi-label --> man+surfboard, woman+car, etc. (intra-class)
+    'Comps' compares two classes --> man vs. surfboard, woman+car vs woman etc. (inter-class)
+    
+    Args:
+        model_name: Name of model to perform bias metric experiment on
+        dataset_name: Analysis set
+        save_path: Path to save averaged results, ex. 'experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'
+        mins_maxes_pt: Dictionary mapping class name (V in config file) to a list of mins and maxes of 
+                       bias metric iterations (result of intra_class_similarity_error_bars() and 
+                       inter_class_similarity_error_bars()) for features extracted from pretrained model for intra-class
+        mins_maxes_ft: Dictionary mapping class name (LABEL_NAMES in config file) to a list of mins and maxes of 
+                       bias metric iterations (result of intra_class_similarity_error_bars() and 
+                       inter_class_similarity_error_bars()) for features extracted from finetuned model for intra-class
+        mins_maxes_comps_pt: Dictionary mapping class name (LABEL_NAMES in config file) to a list of mins and maxes of 
+                             bias metric iterations (result of intra_class_similarity_error_bars() and 
+                             inter_class_similarity_error_bars()) for features extracted from pretrained model for inter-class
+        mins_maxes_comps_ft: Dictionary mapping class name (LABEL_NAMES in config file) to a list of mins and maxes of 
+                             bias metric iterations (result of intra_class_similarity_error_bars() and 
+                             inter_class_similarity_error_bars()) for features extracted from finetuned model for inter-class
+        comps_stats: Dictionary mapping class comparisons (ex. man+woman vs. man) defined in COMPS in config to
+                     a tuple of (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() for features extracted 
+                     from pretrained model
+        comps_stats_ft: Dictionary mapping class comparisons (ex. man+woman vs. man) defined in COMPS in config to
+                     a tuple of (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() for features extracted 
+                     from finetuned model
+        self_similarities_stats: Dictionary mapping class names (LABEL_NAMES in config) to a tuple of 
+                                 (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() 
+                                 for features extracted from pretrained model
+        self_similarities_stats_ft: Dictionary mapping class names (LABEL_NAMES in config) to a tuple of 
+                                 (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() 
+                                 for features extracted from finetuned model
+        category_features: Classes to be plotted
+        plot_type: Indiv, Pairs, Comps --> subset of classes in analysis set
+        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
+        pca_comps: Whether to perform averaging on features that have been transformed with PCA
+        
+    """
     if pca_comps == 'None':
         pca_path = 'no_pca/'
     else:
