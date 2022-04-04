@@ -104,7 +104,7 @@ def lightning_train(args, dataloaders: dict, model_path: str, resume_training: b
         if args.model_name == 'clip':
             model_setup = CLIP_model(args, model_path)
             model_ft, criterion, optimizer = model_setup.setup_model()
-            checkpoint = torch.load(model_path+'/model/model.pt')
+            checkpoint = torch.load(args.checkpoint+'/model/model.pt')
             model_ft.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             model_ft, _, _ = model_setup.train_model(args.dataset, model_ft, dataloaders, criterion, optimizer, num_epochs=args.epochs)
@@ -113,7 +113,7 @@ def lightning_train(args, dataloaders: dict, model_path: str, resume_training: b
         elif args.model_name in models_implemented:
             model_setup = LitPytorchModels(args, model_path)
             logger = TensorBoardLogger(model_path+'/model', name=args.model_name)
-            trainer = Trainer(gpus=1, default_root_dir=model_path+'/model', logger=logger, callbacks=[], max_epochs=args.epochs, resume_from_checkpoint=checkpoint)
+            trainer = Trainer(gpus=1, default_root_dir=model_path+'/model', logger=logger, callbacks=[], max_epochs=args.epochs, resume_from_checkpoint=args.checkpoint)
             trainer.fit(model_setup, dataloaders['train'], dataloaders['val'])
             trainer.validate(dataloaders=dataloaders['val'])
             
@@ -204,12 +204,16 @@ def main():
             help='model type: clip, resnet18, resnet34, resnet50, resnet101, resnet152, resnext50_32x4d, resnext101_32x8d, wide_resnet50_2, wide_resnet101_2, alexnet, vgg, densenet, googlenet', default='resnet18')
     parser.add_argument('--dataset', type=str,
             help='Options: coco and openimages', default='coco')
-    parser.add_argument('--coco_path', type=str,
-            help='folder path to coco dataset', default="/localtmp/data/coco2017/coco_dataset/")
-    parser.add_argument('--openimages_path', type=str,
-            help='folder path to openimages', default="/data/openimages/")
+    # parser.add_argument('--coco_path', type=str,
+    #         help='folder path to coco dataset', default="/localtmp/data/coco2017/coco_dataset/")
+    parser.add_argument('--dataset_path', type=str,
+            help='folder path to training dataset', default="/localtmp/data/coco2017/coco_dataset/")
+    parser.add_argument('--analysis_set_path', type=str,
+            help='folder path to analysis dataset', default="/localtmp/data/coco2017/coco_dataset/")
+    # parser.add_argument('--openimages_path', type=str,
+    #         help='folder path to openimages', default="/data/openimages/")
     parser.add_argument('--bias_analysis',
-            help='If True, performs cosine self similarity experiments', action='store_false')
+            help='If True, performs cosine self similarity experiments', action='store_true')
     parser.add_argument('--load_features',
             help='If model has been trained, and want to use saved features for bias analysis', action='store_true')
     parser.add_argument('--pretrained_features', 
@@ -230,8 +234,8 @@ def main():
             help='plot bias analysis across multiple trials', action='store_true')
     parser.add_argument('--extract_cross_analysis_features',
             help='extract features for an analysis set different than data the model is trained on', action='store_true')
-    parser.add_argument('--cross_analysis',
-            help='Bias analysis for model trained on a different dataset than the analysis set', action='store_true')
+    # parser.add_argument('--cross_analysis',
+    #         help='Bias analysis for model trained on a different dataset than the analysis set', action='store_true')
     parser.add_argument('--trial_path', type=str,
             help='path to training run', default='experiments/coco/bit_resnet50/2022-01-15 14:18:21')
     parser.add_argument('--checkpoint', type=str,
@@ -269,12 +273,12 @@ def main():
         features = extract_features(args, args.trial_path, only_pretrained=False, model_ft=model_ft)
         if args.bias_analysis == True:
             run_experiment(args.model_name, args.trial_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained = False, multiple_trials=args.multiple_trials)
-    elif args.bias_analysis == True and args.pretrained_features == True:
+    elif args.pretrained_features == True:
         # Only extract pretrained features and perform bias analysis on pretrained features
         print("Extracting features on pretrained model for dataset: "+ args.analysis_set)
-        features = extract_features(args, model_path, only_pretrained=True, model_ft=None)
+        features = extract_features(args, args.trial_path, only_pretrained=True, model_ft=None)
         if args.bias_analysis == True:
-            run_experiment(args.model_name, model_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained=True, multiple_trials=args.multiple_trials)
+            run_experiment(args.model_name, args.trial_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained=True, multiple_trials=args.multiple_trials)
     else:
         # Finetune, train the model from scratch or resume training, extract both pretrained and finetuned features and run bias analysis on them
         dataloaders_dict = setup_dataset(args)

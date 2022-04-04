@@ -229,7 +229,7 @@ class PytorchFeatureExtractor():
     def __init__(self, args, model_path):
         self.dataset = args.analysis_set
         if self.dataset == 'openimages':
-            self.openimages_path = args.openimages_path+"val/"
+            self.openimages_path = args.analysis_set_path+"val/"
         self.model_path = model_path
         self.model_name = args.model_name
         self.num_classes = args.num_classes

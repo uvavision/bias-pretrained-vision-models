@@ -225,7 +225,7 @@ class ClipViTFeatureExtractor():
     def __init__(self, args, model_path):
         self.dataset = args.analysis_set
         if self.dataset == 'openimages':
-            self.openimages_path = args.openimages_path+"val/"
+            self.openimages_path = args.analysis_set_path+"val/"
         self.model_path = model_path
 
     def process_images(self, list_imgs):

@@ -145,10 +145,10 @@ def setup_dataset(args):
                 CenterCrop(crop_size),
                 ToTensor()
         ])
-        train_imgs = args.coco_path + "train2017/train2017"
-        val_imgs = args.coco_path + "val2017"
-        train_anns = args.coco_path + "annotations/instances_train2017.json"
-        val_anns = args.coco_path + "annotations/instances_val2017.json"
+        train_imgs = args.dataset_path + "train2017/train2017"
+        val_imgs = args.dataset_path + "val2017"
+        train_anns = args.dataset_path + "annotations/instances_train2017.json"
+        val_anns = args.dataset_path + "annotations/instances_val2017.json"
         coco_train = dset.CocoDetection(root=train_imgs, annFile=train_anns, 
                                         transform=train_preprocess)
         coco_val = dset.CocoDetection(root=val_imgs, annFile=val_anns,
@@ -176,8 +176,8 @@ def setup_dataset(args):
                 CenterCrop(224),
                 ToTensor()
         ])
-        train_dataset = OpenImages(Path(args.openimages_path), split="train", transform=preprocess)
-        val_dataset = OpenImages(Path(args.openimages_path), split="val", transform=preprocess)
+        train_dataset = OpenImages(Path(args.dataset_path), split="train", transform=preprocess)
+        val_dataset = OpenImages(Path(args.dataset_path), split="val", transform=preprocess)
 
 
         train_dataloader = torch.utils.data.DataLoader(train_dataset,
