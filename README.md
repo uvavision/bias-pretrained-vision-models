@@ -30,7 +30,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --analysis_set_path <path to analysis set dataset> \
     --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
     --trial_path < path to finetuned model: e.g. 'experiments/coco/bit_resnet50/2022-01-21\ 19\:03\:29'> \
-    --bias_analysis
+    --bias_analysis \
     --finetune
 ```
 2. Feature extraction for a pretrained model on an analysis set: extracting features from a loaded pretrained model. The following command also runs bias analysis on the extracted features with the ```--bias_analysis``` flag.
@@ -44,7 +44,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --analysis_set_path <path to analysis set dataset> \
     --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
     --trial_path < path to finetuned model: e.g. 'experiments/coco/bit_resnet50/2022-01-21\ 19\:03\:29'> \
-    --bias_analysis
+    --bias_analysis \
     --finetune
 ```
 3. Using saved features (both pretrained and finetuned) to perform bias analysis. 
@@ -58,7 +58,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --analysis_set_path <path to analysis set dataset> \
     --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
     --trial_path < path to finetuned model: e.g. 'experiments/coco/bit_resnet50/2022-01-21\ 19\:03\:29'> \
-    --bias_analysis
+    --bias_analysis \
     --finetune
 ```
 4. For a given model, average across finetuning trial runs and perform bias analysis experiment
@@ -71,7 +71,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --analysis_set <name of analysis set: e.g. 'openimages'> \
     --analysis_set_path <path to analysis set dataset> \
     --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
-    --bias_analysis
+    --bias_analysis \
     --finetune
 ```
 5. Finetune an available model, perform feature extraction on analysis set and bias analysis on extracted features
@@ -112,6 +112,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --analysis_set_path <path to analysis set dataset> \
     --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
     --bias_analysis \
+    --finetune \
     --checkpoint <path to checkpoint: e.g. 'experiments/coco/resnet50/2022-01-19\ 16\:43\:15/model/resnet50/version_0/checkpoints/epoch\=24-step\=46224.ckpt'> \
     --seed <\#>
 ```
