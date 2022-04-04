@@ -10,7 +10,7 @@ conda env create -f environment.yml
 conda activate bias_vision
 ```
 ## Usage
-Currently, this repo supports the following five features:
+Currently, this repo supports the following six features:
 1. Feature extraction for a finetuned model on a specified analysis set: extracting features from a loaded pretrained model (model with loaded weights) *and* that same model after it has been finetuned. The following command also runs bias analysis on the extracted features with the ```--bias_analysis``` flag.
 ```bash
 CUDA_VISIBLE_DEVICES=\# python train.py \
@@ -99,7 +99,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --analysis_set_path <path to analysis set dataset> \
     --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
     --bias_analysis \
-    --checkpoint < path to checkpoint: e.g. 'experiments/coco/resnet50/2022-01-19\ 16\:43\:15/model/resnet50/version_0/checkpoints/epoch\=24-step\=46224.ckpt'> \
+    --checkpoint <path to checkpoint: e.g. 'experiments/coco/resnet50/2022-01-19\ 16\:43\:15/model/resnet50/version_0/checkpoints/epoch\=24-step\=46224.ckpt'> \
     --seed <\#>
 ```
 ## Replicating Results
@@ -118,3 +118,10 @@ The following models have already been implemented:
 ### Training on an additional dataset
 
 ## Contents
+- `analysis_sets/`: coco and openimages analysis sets where each subfolder contains text files for each class in an analysis sets that details image ids or urls for that dataset
+- `config/`: config files for each analysis set
+- `cosine_analysis/`: functions to replicate results from paper and generate bias analysis results on additional trials
+- `models_def/`: Definitions for model types, contains training and feature extraction details
+- `data_loader.py`: Dataloaders for training datasets
+- `model_init.py`: Initializes model for finetuning by reshaping the last layer and configures the optimizers, loss function and other hyperparameters
+- `train.py` : contains generalized training details and cmd line functions
