@@ -252,12 +252,10 @@ def main():
             os.mkdir('experiments/'+ args.dataset + '/' + args.model_name+'/'+datestring)
             model_path = 'experiments/'+ args.dataset + '/' + args.model_name+'/'+datestring
             setup_dirs(model_path)
-            only_pretrained_features = False
         else:
             os.mkdir('experiments/'+ args.dataset + '/' +args.model_name+'/model_scratch'+'/'+datestring)
             model_path = 'experiments/'+ args.dataset + '/' +args.model_name+'/model_scratch'+'/'+datestring
             setup_dirs(model_path, from_scratch=True)
-            only_pretrained_features = True
 
     if args.bias_analysis == True and args.load_features == True and not args.pretrained_features and not args.extract_cross_analysis_features:
         # Don't finetune and just use saved features for full bias analysis with finetuned and pretrained features
@@ -266,24 +264,27 @@ def main():
         run_experiment(args.model_name, args.trial_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained = False, multiple_trials=args.multiple_trials)
     elif args.extract_cross_analysis_features == True:
         # Extracts pretrained and finetuned features for a model on an analysis set regardless of what dataset the model was trained on
-        print("Extracting features for dataset: "+args.analysis_set)
+        print("Extracting features on pretrained and finetued model for dataset: "+args.analysis_set)
         model_ft = lightning_setup(args)
         features = extract_features(args, args.trial_path, only_pretrained=False, model_ft=model_ft)
-    # elif args.bias_analysis == True and args.pretrained_features == True:
-    #     # Only extract pretrained features and perform bias analysis on pretrained features
-    #     print("Extracting pretrained features for bias analysis")
-    #     features = extract_features(args, model_path, only_pretrained=True, model_ft=None)
-    #     run_experiment(args.model_name, model_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained=True, multiple_trials=args.multiple_trials)
+        if args.bias_analysis == True:
+            run_experiment(args.model_name, args.trial_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained = False, multiple_trials=args.multiple_trials)
+    elif args.bias_analysis == True and args.pretrained_features == True:
+        # Only extract pretrained features and perform bias analysis on pretrained features
+        print("Extracting features on pretrained model for dataset: "+ args.analysis_set)
+        features = extract_features(args, model_path, only_pretrained=True, model_ft=None)
+        if args.bias_analysis == True:
+            run_experiment(args.model_name, model_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained=True, multiple_trials=args.multiple_trials)
     else:
         # Finetune, train the model from scratch or resume training, extract both pretrained and finetuned features and run bias analysis on them
         dataloaders_dict = setup_dataset(args)
         model_ft = lightning_train(args, dataloaders_dict, model_path, resume_training=args.resume_training)
         features = extract_features(args, model_path, only_pretrained=False, model_ft=model_ft)
         if args.bias_analysis == True:
-            if args.pca != 0.0:
-                features = load_features(model_path, pca=args.pca, analysis_set=args.analysis_set, only_pretrained=False)
+            # if args.pca != 0.0:
+                # features = load_features(model_path, pca=args.pca, analysis_set=args.analysis_set, only_pretrained=False)
             # Run full bias experiment on finetuned and pretrained features
-            run_experiment(args.model_name, model_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained = only_pretrained_features, multiple_trials=args.multiple_trials)
+            run_experiment(args.model_name, model_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained = False, multiple_trials=args.multiple_trials)
 
 if __name__ == '__main__':
     main()
