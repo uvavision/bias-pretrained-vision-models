@@ -13,7 +13,13 @@ conda activate bias_vision
 Currently, this repo supports the following five features:
 1. Feature extraction for a finetuned model on a specified analysis set: extracting features from a loaded pretrained model (model with loaded weights) *and* that same model after it has been finetuned
 ```bash
-CUDA_VISIBLE_DEVICES=\# python train.py --model_name <name of finetuned model: e.g. 'bit_resnet50'> --num_classes <number of classes in dataset the model was finetuned on>--extract_cross_analysis_features --analysis_set <name of analysis set: e.g. 'openimages'> --config_file <analysis set config: e.g. 'config/openimages.yaml'> --trial_path < path to finetuned model: e.g. 'experiments/coco/bit_resnet50/2022-01-21\ 19\:03\:29'>
+CUDA_VISIBLE_DEVICES=\# python train.py \
+    --model_name <name of finetuned model: e.g. 'bit_resnet50'> \
+    --num_classes <number of classes in dataset the model was finetuned on> \
+    --extract_cross_analysis_features \
+    --analysis_set <name of analysis set: e.g. 'openimages'> \
+    --config_file <analysis set config: e.g. 'config/openimages.yaml'>\ 
+    --trial_path < path to finetuned model: e.g. 'experiments/coco/bit_resnet50/2022-01-21\ 19\:03\:29'>
 ```
 2. Feature extraction for a pretrained model on an analysis set: extracting features from a loaded pretrained model 
 ```bash
