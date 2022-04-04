@@ -9,6 +9,14 @@
 conda env create -f environment.yml
 conda activate bias_vision
 ```
+
+### Datasets
+#### COCO 2017
+Download and setup images and annotations [here](https://cocodataset.org/#download)
+
+#### Open Images
+Download and setup images and annotations [here](https://storage.googleapis.com/openimages/web/download.html)
+
 ## Usage
 Currently, this repo supports the following six features:
 1. Feature extraction for a finetuned model on a specified analysis set: extracting features from a loaded pretrained model (model with loaded weights) *and* that same model after it has been finetuned. The following command also runs bias analysis on the extracted features with the ```--bias_analysis``` flag.
