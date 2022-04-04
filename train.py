@@ -269,11 +269,11 @@ def main():
         print("Extracting features for dataset: "+args.analysis_set)
         model_ft = lightning_setup(args)
         features = extract_features(args, args.trial_path, only_pretrained=False, model_ft=model_ft)
-    elif args.bias_analysis == True and args.pretrained_features == True:
-        # Only extract pretrained features and perform bias analysis on pretrained features
-        print("Extracting pretrained features for bias analysis")
-        features = extract_features(args, model_path, only_pretrained=True, model_ft=None)
-        run_experiment(args.model_name, model_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained=True, multiple_trials=args.multiple_trials)
+    # elif args.bias_analysis == True and args.pretrained_features == True:
+    #     # Only extract pretrained features and perform bias analysis on pretrained features
+    #     print("Extracting pretrained features for bias analysis")
+    #     features = extract_features(args, model_path, only_pretrained=True, model_ft=None)
+    #     run_experiment(args.model_name, model_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained=True, multiple_trials=args.multiple_trials)
     else:
         # Finetune, train the model from scratch or resume training, extract both pretrained and finetuned features and run bias analysis on them
         dataloaders_dict = setup_dataset(args)
