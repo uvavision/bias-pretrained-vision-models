@@ -31,6 +31,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
     --trial_path < path to finetuned model: e.g. 'experiments/coco/bit_resnet50/2022-01-21\ 19\:03\:29'> \
     --bias_analysis
+    --finetune
 ```
 2. Feature extraction for a pretrained model on an analysis set: extracting features from a loaded pretrained model. The following command also runs bias analysis on the extracted features with the ```--bias_analysis``` flag.
 ```bash
@@ -44,6 +45,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
     --trial_path < path to finetuned model: e.g. 'experiments/coco/bit_resnet50/2022-01-21\ 19\:03\:29'> \
     --bias_analysis
+    --finetune
 ```
 3. Using saved features (both pretrained and finetuned) to perform bias analysis. 
 ```bash
@@ -53,9 +55,11 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --num_classes <number of classes /in dataset the model was finetuned on: e.g. 80> \
     --load_features \
     --analysis_set <name of analysis set: e.g. 'openimages'> \
+    --analysis_set_path <path to analysis set dataset> \
     --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
     --trial_path < path to finetuned model: e.g. 'experiments/coco/bit_resnet50/2022-01-21\ 19\:03\:29'> \
     --bias_analysis
+    --finetune
 ```
 4. For a given model, average across finetuning trial runs and perform bias analysis experiment
 ```bash
@@ -68,6 +72,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --analysis_set_path <path to analysis set dataset> \
     --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
     --bias_analysis
+    --finetune
 ```
 5. Finetune an available model, perform feature extraction on analysis set and bias analysis on extracted features
 ```bash

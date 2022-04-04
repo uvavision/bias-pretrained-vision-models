@@ -57,30 +57,36 @@ def setup_dirs(base_path: str, from_scratch: bool = False):
         from_scratch: 
     """
     os.mkdir(base_path+'/'+'metric_data', mode=0o777)
-    os.mkdir(base_path+'/'+'metric_data/'+'pca', mode=0o777)
-    os.mkdir(base_path+'/'+'metric_data/'+'pca/'+'correlation', mode=0o777)
-    os.mkdir(base_path+'/'+'metric_data/'+'pca/'+'cosine', mode=0o777)
-    os.mkdir(base_path+'/'+'metric_data/'+'pca/'+'euclidean', mode=0o777)
+    os.mkdir(base_path+'/'+'metric_data/'+'coco', mode=0o777)
+    os.mkdir(base_path+'/'+'metric_data/'+'openimages', mode=0o777)
 
-    os.mkdir(base_path+'/'+'metric_data/'+'no_pca', mode=0o777)
-    os.mkdir(base_path+'/'+'metric_data/'+'no_pca/'+'correlation', mode=0o777)
-    os.mkdir(base_path+'/'+'metric_data/'+'no_pca/'+'cosine', mode=0o777)
-    os.mkdir(base_path+'/'+'metric_data/'+'no_pca/'+'euclidean', mode=0o777)
+    os.mkdir(base_path+'/'+'metric_data/coco/'+'no_pca', mode=0o777)
+    os.mkdir(base_path+'/'+'metric_data/coco/'+'no_pca/'+'correlation', mode=0o777)
+    os.mkdir(base_path+'/'+'metric_data/coco/'+'no_pca/'+'cosine', mode=0o777)
+    os.mkdir(base_path+'/'+'metric_data/coco/'+'no_pca/'+'euclidean', mode=0o777)
 
-    os.mkdir(base_path+'/'+'cross_analysis', mode=0o777)
-    os.mkdir(base_path+'/'+'cross_analysis/'+'openimages', mode=0o777)
+    os.mkdir(base_path+'/'+'metric_data/openimages/'+'no_pca', mode=0o777)
+    os.mkdir(base_path+'/'+'metric_data/openimages/'+'no_pca/'+'correlation', mode=0o777)
+    os.mkdir(base_path+'/'+'metric_data/openimages/'+'no_pca/'+'cosine', mode=0o777)
+    os.mkdir(base_path+'/'+'metric_data/openimages/'+'no_pca/'+'euclidean', mode=0o777)
 
     os.mkdir(base_path+'/'+'boxplots', mode=0o777)
-    os.mkdir(base_path+'/'+'boxplots/'+'pca', mode=0o777)
-    os.mkdir(base_path+'/'+'boxplots/'+'pca/'+'correlation', mode=0o777)
-    os.mkdir(base_path+'/'+'boxplots/'+'pca/'+'cosine', mode=0o777)
-    os.mkdir(base_path+'/'+'boxplots/'+'pca/'+'euclidean', mode=0o777)
+    os.mkdir(base_path+'/'+'boxplots/'+'coco', mode=0o777)
+    os.mkdir(base_path+'/'+'boxplots/'+'openimages', mode=0o777)
 
-    os.mkdir(base_path+'/'+'boxplots/'+'no_pca', mode=0o777)
-    os.mkdir(base_path+'/'+'boxplots/'+'no_pca/'+'correlation', mode=0o777)
-    os.mkdir(base_path+'/'+'boxplots/'+'no_pca/'+'cosine', mode=0o777)
-    os.mkdir(base_path+'/'+'boxplots/'+'no_pca/'+'euclidean', mode=0o777)        
+    os.mkdir(base_path+'/'+'boxplots/coco/'+'no_pca', mode=0o777)
+    os.mkdir(base_path+'/'+'boxplots/coco/'+'no_pca/'+'correlation', mode=0o777)
+    os.mkdir(base_path+'/'+'boxplots/coco/'+'no_pca/'+'cosine', mode=0o777)
+    os.mkdir(base_path+'/'+'boxplots/coco/'+'no_pca/'+'euclidean', mode=0o777)        
     
+
+    os.mkdir(base_path+'/'+'boxplots/openimages/'+'no_pca', mode=0o777)
+    os.mkdir(base_path+'/'+'boxplots/openimages/'+'no_pca/'+'correlation', mode=0o777)
+    os.mkdir(base_path+'/'+'boxplots/openimages/'+'no_pca/'+'cosine', mode=0o777)
+    os.mkdir(base_path+'/'+'boxplots/openimages/'+'no_pca/'+'euclidean', mode=0o777) 
+
+
+
     os.mkdir(base_path+'/'+'features', mode=0o777)
     os.mkdir(base_path+'/'+'features/' + 'coco', mode=0o777)
     os.mkdir(base_path+'/'+'features/' + 'openimages', mode=0o777)
