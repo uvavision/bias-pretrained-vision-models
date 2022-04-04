@@ -255,7 +255,7 @@ class PytorchFeatureExtractor():
             images_stacked.append(input_tensor)
         return torch.tensor(torch.stack(images_stacked,0))
 
-    def extract_features(self, model, directory: list, norm="norm_one"):
+    def extract_features_model(self, model, directory: list, norm="norm_one"):
         """Preprocesses batch of images and extracts features from the penultimate layer of the model"""
         features_dir = [] # batch x 16 x 2048
         images_processed = self.process_imgs(directory)
@@ -288,11 +288,11 @@ class PytorchFeatureExtractor():
             resnet_model=nn.Sequential(*modules)
             for p in resnet_model.parameters():
                 p.requires_grad = False
-            features = self.extract_features(resnet_model, images)
+            features = self.extract_features_model(resnet_model, images)
         else:
             if self.model_name == 'bit_resnet50':
                 model_loaded.head = model_loaded.head[:-1]
-                features = self.extract_features(model_loaded, images)
+                features = self.extract_features_model(model_loaded, images)
         return features
 
     def build_features_ft(self, model_ft, images: list):
@@ -302,12 +302,12 @@ class PytorchFeatureExtractor():
             resnet_model=nn.Sequential(*modules)
             for p in resnet_model.parameters():
                 p.requires_grad = False
-            features = self.extract_features(resnet_model, images)
+            features = self.extract_features_model(resnet_model, images)
         else:
             if self.model_name == 'bit_resnet50':
                 temp_model = copy.deepcopy(model_ft)
                 temp_model.head = temp_model.head[:-1]
-                features = self.extract_features(temp_model, images)
+                features = self.extract_features_model(temp_model, images)
         return features
     
     def pca_analysis(self, features, pca_comps: float, path: str):

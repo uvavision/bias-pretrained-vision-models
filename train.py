@@ -268,7 +268,7 @@ def main():
         run_experiment(args.model_name, args.trial_path, args.dataset, args.analysis_set, features, args.config_file, args.bias_metric, args.pca, only_pretrained = False, multiple_trials=args.multiple_trials)
     elif args.extract_cross_analysis_features == True:
         # Extracts pretrained and finetuned features for a model on an analysis set regardless of what dataset the model was trained on
-        print("Extracting features on pretrained and finetued model for dataset: "+args.analysis_set)
+        print("Extracting features on pretrained and finetuned model for dataset: "+args.analysis_set)
         model_ft = lightning_setup(args)
         features = extract_features(args, args.trial_path, only_pretrained=False, model_ft=model_ft)
         if args.bias_analysis == True:
