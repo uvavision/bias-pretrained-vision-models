@@ -1,4 +1,4 @@
-name: coco_exp
+name: bias_vision
 channels:
   - anaconda
   - conda-forge
