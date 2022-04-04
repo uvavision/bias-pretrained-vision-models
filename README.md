@@ -11,12 +11,19 @@ conda activate bias_vision
 ```
 
 ### Datasets
+We currently support finetuning on the following datasets: COCO 2017 and Open Images, please refer to section "Training on an additional dataset" for details on how to add an additional dataset for finetuning 
+
 #### COCO 2017
 Download and setup images and annotations [here](https://cocodataset.org/#download)
 
 #### Open Images
 Download and setup images and annotations [here](https://storage.googleapis.com/openimages/web/download.html)
 
+### Models
+To use SimCLR ResNet50, download ResNet50 (1x) from [here](https://github.com/google-research/simclr) and place the foler in the `models_def/`
+
+
+To use MoCo ResNet50, download MoCo v1 from [here](https://github.com/facebookresearch/moco) and place the .tar file in `models_def/`
 ## Usage
 Currently, this repo supports the following six features:
 1. Feature extraction for a finetuned model on a specified analysis set: extracting features from a loaded pretrained model (model with loaded weights) *and* that same model after it has been finetuned. The following command also runs bias analysis on the extracted features with the ```--bias_analysis``` flag.
