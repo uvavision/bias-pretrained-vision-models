@@ -248,6 +248,7 @@ class PytorchFeatureExtractor():
                 input_image = Image.open(urllib.request.urlopen(filename)).convert("RGB")
             elif self.dataset == 'openimages':
                 input_image = Image.open(self.analysis_set_path+filename.strip()+'.jpg').convert("RGB")
+            # if adding a new analysis set, specify how to open the images in the .txt files in analysis_sets/
             else:
                 print("Dataset not implemented")
             input_tensor = preprocess(input_image)

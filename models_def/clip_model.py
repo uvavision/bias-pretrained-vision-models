@@ -241,6 +241,7 @@ class ClipViTFeatureExtractor():
                 image = preprocess(Image.open(urllib.request.urlopen(filename)).convert("RGB"))
             elif self.dataset == 'openimages':
                 image = preprocess(Image.open(self.openimages_path+filename.strip()+'.jpg').convert("RGB"))
+            # if adding a new analysis set, specify how to open the images in the .txt files in analysis_sets/
             else:
                 print("Dataset not implemented")
             images.append(image) 
