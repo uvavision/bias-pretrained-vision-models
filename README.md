@@ -265,13 +265,14 @@ The following models have already been implemented:
 ```
 1. In `train.py`, modify the `models_implemented` list in `lightning_setup()` and `lightning_train()` and add the name of the model 
 2. In `model_init.py`, modify `load_models_pytorch()` to setup the model to be trained with pytorch lightning for multi-label classification on an available dataset 
-3. Lastly, manually create a directory for your model in the `experiments/` directory, see step 3 in the "Replicating Results" section to ensure training metadata for your model is created. For example, you will only need to create `experiments/analysis_set/model_name/`
+3. Lastly, manually create a directory for your model in the `experiments/` directory, see step 3 in the "Replicating Results" section to ensure training metadata for your model is created. For example, you will only need to create `experiments/analysis_set/model_name/`. We are currently working on a script to automate this. 
 3. *This is discouraged but included here if absolutely necessary* Note, if your model cannot be trained with pytorch lightning, you will need to define a separate function in `model_init.py` following the example for clip: `initialize_model_clip()`. Additionally, you will need to add a file such as `clip_model.py` in `models_def/` defining the training functions and feature extraction logic for such a model. This will also involve modifying `lightning_train(), lightning_setup(), main()` and `extract_features()` in `train.py` to include separate calls for this model. 
 
 ### Adding an Analysis Set
 1. In `analysis_sets/`, create an additional directory with the name of your analysis set that specifies .txt files for each class in the set. The .txt file should contain image_ids or urls to the images in that class
 2. In `config/`, create a .yaml file specifying the metadata for that analysis set. Follow `coco.yaml` for an example. Label names and classes names categories define abbreviations to be used during plotting
 3. `pytorch_models.py` includes a `PytorchFeatureExtractor` class (`clip_model.py` includes one as well) which includes a `process_imgs()` function that specifies how to access the images in the .txt files in `analysis_sets/`. Add in an additional line for your analysis set and modify the class attributes accordingly if needed. 
+4. Currently, you need to manually create a directory in each model's trials to include results for the analysis set, we are currently working on a script to create new dirs with the name of your analysis set
 ### Training on an additional dataset
 
 ## Contents
