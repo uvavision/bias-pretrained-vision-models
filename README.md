@@ -121,6 +121,139 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --seed <\#>
 ```
 ## Replicating Results
+1. To recreate Table 2, refer to the jupyter notebook: `experimental_work/ieat.ipynb`
+2. To recreate Table 3, Figure 3, Table 4 and Figure 4 and all the subsequent plots in the Supplementary material, it is assumed that the `experiments/training_dataset/model_name/` folder contains multiple trial runs for a model, and the results are averaged across these runs. By changing the `--model_name, --num_classes, --analysis_set, --analysis_set_path --config_file` flags, you can generate different sets of results and plots using the saved features and finetuned models 
+```bash
+CUDA_VISIBLE_DEVICES=\# python train.py \
+    --model_name <name of finetuned model: e.g. 'bit_resnet50'> \
+    --num_classes <number of classes in dataset the model was finetuned on> \
+    --load_features \
+    --multiple_trials \
+    --analysis_set <name of analysis set: e.g. 'openimages'> \
+    --analysis_set_path <path to analysis set dataset> \
+    --config_file <analysis set config: e.g. 'config/openimages.yaml'> \ 
+    --bias_analysis \
+    --finetune
+```
+3. We release the metadata for the finetuned models in the `experiments/` directory. All the models from torchvision are saved using pytorch lightning. This directory is set up as follows: 
+
+```bash
+experiments
+├── coco <training dataset>
+│   ├── model_one
+│       ├── trial_one
+│            ├── boxplots
+│                ├── analysis_set_one <coco>
+│                    ├── boxplot_one.pdf
+│                    ...
+│                    ├── boxplots_n.pdf
+│                ├── analysis_set_two <openimages>
+│                    ├── boxplot_one.pdf
+│                    ...
+│                    ├── boxplots_n.pdf
+│            ├── features
+│                ├── analysis_set_one <coco>
+│                    ├── pretrained_features
+│                        ├── feature_one.npy
+│                        ...
+│                        ├── feature_n.npy
+│                    ├── finetuned_features
+│                        ├── feature_one.npy
+│                        ...
+│                        ├── feature_n.npy
+│                ├── analysis_set_two <openimages>
+│                    ├── pretrained_features
+│                        ├── feature_one.npy
+│                        ...
+│                        ├── feature_n.npy
+│                    ├── finetuned_features
+│                        ├── feature_one.npy
+│                        ...
+│                        ├── feature_n.npy
+│            ├── metric_data
+│                ├── analysis_set_one <coco>
+│                    ├── metric_data.npy
+│                ├── analysis_set_two <openimages>
+│                    ├── metric_data.npy
+│            ├── model
+│        ├── trial_two
+│        ...
+│        ├── trial_x
+│        ├── averaged
+│            ├── boxplots
+│                ├── analysis_set_one <coco>
+│                    ├── boxplot_one.pdf
+│                    ...
+│                    ├── boxplots_n.pdf
+│                ├── analysis_set_two <openimages>
+│                    ├── boxplot_one.pdf
+│                    ...
+│                    ├── boxplots_n.pdf
+│            ├── metric_data
+│                ├── analysis_set_one <coco>
+│                    ├── metric_data.npy
+│                ├── analysis_set_two <openimages>
+│                    ├── metric_data.npy
+│   ...
+│   └── model_n
+├── openimages <training dataset>
+│   ├── model_one
+│       ├── trial_one
+│            ├── boxplots
+│                ├── analysis_set_one <coco>
+│                    ├── boxplot_one.pdf
+│                    ...
+│                    ├── boxplots_n.pdf
+│                ├── analysis_set_two <openimages>
+│                    ├── boxplot_one.pdf
+│                    ...
+│                    ├── boxplots_n.pdf
+│            ├── features
+│                ├── analysis_set_one <coco>
+│                    ├── pretrained_features
+│                        ├── feature_one.npy
+│                        ...
+│                        ├── feature_n.npy
+│                    ├── finetuned_features
+│                        ├── feature_one.npy
+│                        ...
+│                        ├── feature_n.npy
+│                ├── analysis_set_two <openimages>
+│                    ├── pretrained_features
+│                        ├── feature_one.npy
+│                        ...
+│                        ├── feature_n.npy
+│                    ├── finetuned_features
+│                        ├── feature_one.npy
+│                        ...
+│                        ├── feature_n.npy
+│            ├── metric_data
+│                ├── analysis_set_one <coco>
+│                    ├── metric_data.npy
+│                ├── analysis_set_two <openimages>
+│                    ├── metric_data.npy
+│            ├── model
+│        ├── trial_two
+│        ...
+│        ├── trial_x
+│        ├── averaged
+│            ├── boxplots
+│                ├── analysis_set_one <coco>
+│                    ├── boxplot_one.pdf
+│                    ...
+│                    ├── boxplots_n.pdf
+│                ├── analysis_set_two <openimages>
+│                    ├── boxplot_one.pdf
+│                    ...
+│                    ├── boxplots_n.pdf
+│            ├── metric_data
+│                ├── analysis_set_one <coco>
+│                    ├── metric_data.npy
+│                ├── analysis_set_two <openimages>
+│                    ├── metric_data.npy
+│   ...
+│   └── model_n
+```
 
 ## Customization
 
