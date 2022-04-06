@@ -13,11 +13,9 @@ conda activate bias_vision
 ### Setup Datasets
 We currently support finetuning on the following datasets: COCO 2017 and Open Images, please refer to section "Training on an additional dataset" for details on how to add an additional dataset for finetuning 
 
-1. #### COCO 2017
-    * Download and setup images and annotations [here](https://cocodataset.org/#download)
+1. #### COCO 2017: Download and setup images and annotations [here](https://cocodataset.org/#download)
 
-2. #### Open Images
-    * Download and setup images and annotations [here](https://storage.googleapis.com/openimages/web/download.html)
+2. #### Open Images: Download and setup images and annotations [here](https://storage.googleapis.com/openimages/web/download.html)
 
 ### Setup Models
 1. To use SimCLR ResNet50, download ResNet50 (1x) from [here](https://github.com/google-research/simclr) and place the foler in the `models_def/` directory
