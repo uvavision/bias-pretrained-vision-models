@@ -175,11 +175,11 @@ experiments
 │                    ├── metric_data.npy
 │                ├── analysis_set_two <openimages>
 │                    ├── metric_data.npy
-│            ├── model
+│            ├── model <training metadata>
 │        ├── trial_two
 │        ...
 │        ├── trial_x
-│        ├── averaged
+│        ├── averaged <results from averaging across trials>
 │            ├── boxplots
 │                ├── analysis_set_one <coco>
 │                    ├── boxplot_one.pdf
@@ -232,11 +232,11 @@ experiments
 │                    ├── metric_data.npy
 │                ├── analysis_set_two <openimages>
 │                    ├── metric_data.npy
-│            ├── model
+│            ├── model <training metadata>
 │        ├── trial_two
 │        ...
 │        ├── trial_x
-│        ├── averaged
+│        ├── averaged <results from averaging across trials>
 │            ├── boxplots
 │                ├── analysis_set_one <coco>
 │                    ├── boxplot_one.pdf
