@@ -272,7 +272,8 @@ The following models have already been implemented:
 1. In `analysis_sets/`, create an additional directory with the name of your analysis set that specifies .txt files for each class in the set. The .txt file should contain image_ids or urls to the images in that class
 2. In `config/`, create a .yaml file specifying the metadata for that analysis set. Follow `coco.yaml` for an example. Label names and classes names categories define abbreviations to be used during plotting
 3. `pytorch_models.py` includes a `PytorchFeatureExtractor` class (`clip_model.py` includes one as well) which includes a `process_imgs()` function that specifies how to access the images in the .txt files in `analysis_sets/`. Add in an additional line for your analysis set and modify the class attributes accordingly if needed. 
-4. Currently, you need to manually create a directory in each model's trials to include results for the analysis set, we are currently working on a script to create new dirs with the name of your analysis set
+4. Currently, you need to manually create a directory in each model's trials to include results for the analysis set, we are currently working on a script to automate this
+
 ### Training on an additional dataset
 
 ## Contents
