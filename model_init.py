@@ -292,6 +292,19 @@ def load_moco(base_encoder, checkpoint_path):
 def load_models_pytorch(model_name: str, num_classes: int, use_pretrained: bool):
     """ Loads model into memory and ppdates the last layer of the model according to num_classes
 
+    To add a new model, add it to the model_init dictionary variable. Note that this only includes
+    models available in torchvision. Other models such as bit_resnet50, and moco_resnet50 are not
+    available in torchvision and thus require additional steps to be loaded. Furthermore, these models
+    also require different steps to modify the last layer for finetuning. For example, all the models 
+    initialized in model_init dictionary can be modified by doing the following:
+
+    num_ftrs = model_ft.fc.in_features
+    model_ft.fc = nn.Linear(num_ftrs, num_classes), 
+
+    ... if the model you are trying to add cannot be modified using this logic, add an additional
+    block to specify the model loading and initialization. Follow the examples for models: bit_resnet50, 
+    moco_resnet50, simclr_resnet50 etc. below. 
+
     Args:
         model_name: Pytorch model to load into memory from torchvision models
         num_classes: Number of classes in the dataset that the model is being finetuned on
@@ -312,8 +325,6 @@ def load_models_pytorch(model_name: str, num_classes: int, use_pretrained: bool)
     model_init['resnext101_32x8d'] = models.resnext101_32x8d
     model_init['wide_resnet50_2'] = models.wide_resnet50_2
     model_init['wide_resnet101_2'] = models.wide_resnet101_2
-    model_init['alexnet'] = models.alexnet
-    model_init['vgg'] = models.vgg11_bn
     model_init['densenet'] = models.densenet121
     model_init['googlenet'] = models.googlenet
 
@@ -343,9 +354,22 @@ def load_models_pytorch(model_name: str, num_classes: int, use_pretrained: bool)
         virtex.fc = nn.Linear(2048, num_classes)
         model_init['virtex_resnet50'] = virtex
         model_ft = model_init['virtex_resnet50']
-
+    elif model_name == 'alexnet':
+        alexnet = models.alexnet(pretrained=use_pretrained)
+        num_ftrs = alexnet.classifier[6].in_features
+        alexnet.classifier[6] = nn.Linear(num_ftrs,num_classes)
+        model_init['alexnet'] = alexnet 
+        model_ft = model_init['alexnet']
+    elif model_name == 'vgg':
+        vgg = models.vgg11_bn
+        num_ftrs = vgg.classifier[6].in_features
+        vgg.classifier[6] = nn.Linear(num_ftrs,num_classes)
+        model_init['vgg'] = vgg
+        model_ft = model_init['vgg']
     elif model_name in model_init:
         model_ft = model_init[model_name](pretrained=use_pretrained)
+        num_ftrs = model_ft.fc.in_features
+        model_ft.fc = nn.Linear(num_ftrs, num_classes)
     else:
         print("Invalid model name, choose from moco_resnet50, resnet18, resnet34, resnet50, resnet101, resnet152, resnext50_32x4d, resnext101_32x8d, wide_resnet50_2, wide_resnet101_2, alexnet, vgg, densenet, googlenet, bit_resnet50, virtex_resnet50")
     return model_ft
@@ -371,13 +395,6 @@ def initialize_model_pytorch(model_name: str, num_classes: int, feature_extract:
 
     model_ft = load_models_pytorch(model_name, num_classes, use_pretrained)
     set_parameter_requires_grad(model_ft, feature_extract)
-    if model_name == 'alexnet' or model_name == 'vgg':
-        num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
-    elif model_name != 'bit_resnet50' and model_name != 'moco_resnet50'and model_name != 'simclr_resnet50':
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs, num_classes)
-    #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     print(model_ft)
     #model_ft = model_ft.to(device)
@@ -395,7 +412,7 @@ def initialize_model_pytorch(model_name: str, num_classes: int, feature_extract:
                 print("\t",name)
 
 
-    # Observe that all parameters are being optimized
+    # Observe that all parameters are being optimized, this would also be the space to add in additional optimizers
     if optimizer_name == 'sgd':
         optimizer = optim.SGD(params_to_update, lr=lr, momentum=momentum, weight_decay=0.0001)
     elif optimizer_name=='adamax':
@@ -404,13 +421,16 @@ def initialize_model_pytorch(model_name: str, num_classes: int, feature_extract:
         optimizer = get_lars_optimizer((model_ft,))
     else:
         optimizer = torch.optim.Adam(params_to_update, lr=lr, betas=(0.9,0.98),eps=1e-6,weight_decay=1e-6)
-    # Setup the loss fxn
+    # Setup the loss fxn --> static because the objective is always multilabel classification. 
     criterion = nn.BCEWithLogitsLoss()
 
     return model_ft, criterion, optimizer
 
 def initialize_model_clip(num_classes: int, lr: float, momentum: float, optimizer_name: str):
     """ Sets up CLIP-ViT/B-32 model parameters for finetuning
+     
+    CLIP-ViT/B-32 does not use pytorch lightning training due to some complicated mix precision
+    training logic so it is defined separately here. 
 
     Args:
         num_classes: Number of classes in the dataset that the model is being finetuned on

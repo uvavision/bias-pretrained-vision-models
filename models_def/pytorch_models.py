@@ -228,8 +228,7 @@ class PytorchFeatureExtractor():
 
     def __init__(self, args, model_path):
         self.dataset = args.analysis_set
-        if self.dataset == 'openimages':
-            self.openimages_path = args.analysis_set_path+"val/"
+        self.analysis_set_path = args.analysis_set_path
         self.model_path = model_path
         self.model_name = args.model_name
         self.num_classes = args.num_classes
@@ -248,7 +247,7 @@ class PytorchFeatureExtractor():
             if self.dataset=='coco':
                 input_image = Image.open(urllib.request.urlopen(filename)).convert("RGB")
             elif self.dataset == 'openimages':
-                input_image = Image.open(self.openimages_path+filename.strip()+'.jpg').convert("RGB")
+                input_image = Image.open(self.analysis_set_path+filename.strip()+'.jpg').convert("RGB")
             else:
                 print("Dataset not implemented")
             input_tensor = preprocess(input_image)

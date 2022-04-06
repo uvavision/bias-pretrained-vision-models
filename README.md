@@ -263,9 +263,15 @@ The following models have already been implemented:
 ['clip', 'moco_resnet50', 'simclr_resnet50','bit_resnet50', 'resnet50', 'resnet18','alexnet', 'vgg', 'densenet', 'fasterrcnn', 'retinanet', 'googlenet', 'resnet34', 
                     'resnet101', 'resnet152', 'resnext50_32x4d', 'resnext101_32x8d', 'wide_resnet50_2', 'wide_resnet101_2', 'virtex_resnet50']
 ```
+1. In `train.py`, modify the `models_implemented` list in `lightning_setup()` and `lightning_train()` and add the name of the model 
+2. In `model_init.py`, modify `load_models_pytorch()` to setup the model to be trained with pytorch lightning for multi-label classification on an available dataset 
+3. Lastly, manually create a directory for your model in the `experiments/` directory, see step 3 in the "Replicating Results" section to ensure training metadata for your model is created. For example, you will only need to create `experiments/analysis_set/model_name/`
+3. *This is discouraged but included here if absolutely necessary* Note, if your model cannot be trained with pytorch lightning, you will need to define a separate function in `model_init.py` following the example for clip: `initialize_model_clip()`. Additionally, you will need to add a file such as `clip_model.py` in `models_def/` defining the training functions and feature extraction logic for such a model. This will also involve modifying `lightning_train(), lightning_setup(), main()` and `extract_features()` in `train.py` to include separate calls for this model. 
 
 ### Adding an Analysis Set
-
+1. In `analysis_sets/`, create an additional directory with the name of your analysis set that specifies .txt files for each class in the set. The .txt file should contain image_ids or urls to the images in that class
+2. In `config/`, create a .yaml file specifying the metadata for that analysis set. Follow `coco.yaml` for an example. Label names and classes names categories define abbreviations to be used during plotting
+3. `pytorch_models.py` includes a `PytorchFeatureExtractor` class (`clip_model.py` includes one as well) which includes a `process_imgs()` function that specifies how to access the images in the .txt files in `analysis_sets/`. Add in an additional line for your analysis set and modify the class attributes accordingly if needed. 
 ### Training on an additional dataset
 
 ## Contents
@@ -276,3 +282,4 @@ The following models have already been implemented:
 - `data_loader.py`: Dataloaders for training datasets
 - `model_init.py`: Initializes model for finetuning by reshaping the last layer and configures the optimizers, loss function and other hyperparameters
 - `train.py` : contains generalized training details and cmd line functions
+- `experiments/`: contains metadata for all trained models in the paper
