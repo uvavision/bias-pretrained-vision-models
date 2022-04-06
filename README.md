@@ -13,17 +13,15 @@ conda activate bias_vision
 ### Setup Datasets
 We currently support finetuning on the following datasets: COCO 2017 and Open Images, please refer to section "Training on an additional dataset" for details on how to add an additional dataset for finetuning 
 
-#### COCO 2017
-Download and setup images and annotations [here](https://cocodataset.org/#download)
+1. #### COCO 2017
+    * Download and setup images and annotations [here](https://cocodataset.org/#download)
 
-#### Open Images
-Download and setup images and annotations [here](https://storage.googleapis.com/openimages/web/download.html)
+2. #### Open Images
+    * Download and setup images and annotations [here](https://storage.googleapis.com/openimages/web/download.html)
 
 ### Setup Models
-To use SimCLR ResNet50, download ResNet50 (1x) from [here](https://github.com/google-research/simclr) and place the foler in the `models_def/` directory
-
-
-To use MoCo ResNet50, download MoCo v1 from [here](https://github.com/facebookresearch/moco) and place the .tar file in `models_def/` directory
+1. To use SimCLR ResNet50, download ResNet50 (1x) from [here](https://github.com/google-research/simclr) and place the foler in the `models_def/` directory
+2. To use MoCo ResNet50, download MoCo v1 from [here](https://github.com/facebookresearch/moco) and place the .tar file in `models_def/` directory
 
 ## Usage
 Currently, this repo supports the following six features:
