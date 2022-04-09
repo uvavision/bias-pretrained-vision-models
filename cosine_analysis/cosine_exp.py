@@ -344,7 +344,7 @@ def multiple_trials_exp(model_name, save_path, train_dataset, dataset_name, conf
         plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, final_comps_similarities_pt, final_comps_similarities_ft, final_self_similarities_pt, final_self_similarities_ft, config['MISC_PLOTS'][misc], misc, bias_metric, pca_comps)
 
 
-def run_experiment(model_name, save_path, train_dataset, dataset_name, features, config_path, bias_metric, pca_comps, only_pretrained=False, multiple_trials=False):
+def run_experiment(model_name, save_path, train_dataset, dataset_name, config_path, bias_metric, pca_comps, features=None, only_pretrained=False, multiple_trials=False):
     """Runs the bias analysis experiment on a model trial
     
     Args:
