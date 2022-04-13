@@ -107,13 +107,16 @@ def load_features(folder: str, analysis_set: str, only_pretrained: bool = False)
         features = dict()
         features_pt = os.listdir(folder+'/features/'+analysis_set + '/pretrained_features/')
         for file_name in features_pt:
-            features[os.path.splitext(file_name)[0]] = np.load(folder + '/features/' + analysis_set + '/pretrained_features/' + file_name, allow_pickle=True)
+            if file_name != '.ipynb_checkpoints':
+                features[os.path.splitext(file_name)[0]] = np.load(folder + '/features/' + analysis_set + '/pretrained_features/' + file_name, allow_pickle=True)
     else:
         features = dict()
         features_pt = os.listdir(folder+'/features/'+analysis_set +'/pretrained_features/')
         features_ft = os.listdir(folder+'/features/'+analysis_set +'/finetuned_features/')
         for file_name in features_pt:
-            features[os.path.splitext(file_name)[0]] = np.load(folder +'/features/'+analysis_set + '/pretrained_features/' + file_name, allow_pickle=True)
+            if file_name != '.ipynb_checkpoints':
+                features[os.path.splitext(file_name)[0]] = np.load(folder +'/features/'+analysis_set + '/pretrained_features/' + file_name, allow_pickle=True)
         for file_name in features_ft:
-            features[os.path.splitext(file_name)[0]] = np.load(folder +'/features/'+analysis_set + '/finetuned_features/' + file_name, allow_pickle=True)
+            if file_name != '.ipynb_checkpoints':
+                features[os.path.splitext(file_name)[0]] = np.load(folder +'/features/'+analysis_set + '/finetuned_features/' + file_name, allow_pickle=True)
     return features
