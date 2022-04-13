@@ -65,7 +65,7 @@ import pandas as pd
 fontP = FontProperties()
 fontP.set_size('small')
 
-def plot_indiv_categories(model_name, dataset_name, save_path, category_features, comps_stats, self_similarities_stats, category_name, bias_metric, pca_comps):
+def plot_indiv_categories(model_name, dataset_name, save_path, category_features, comps_stats, self_similarities_stats, category_name):
     """Plots bias analysis experiment results for 'Indiv' subset of classes
     'Indiv': single classes --> man, woman, surfboard, car, refrigerator, etc. (intra-class)
     
@@ -81,8 +81,6 @@ def plot_indiv_categories(model_name, dataset_name, save_path, category_features
                                  (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() 
                                  for features extracted from pretrained model
         category_name: Name of single class: 'car, surfboard, refrigerator' etc. --> config['INDIVIDUAL_PLOTS']['category_list']
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
-        pca_comps: Whether to use features that have been transformed with PCA
         
     """
     y = []
@@ -108,23 +106,15 @@ def plot_indiv_categories(model_name, dataset_name, save_path, category_features
     #plt.legend(labels, loc="lower center", bbox_to_anchor=(0.5, -0.6), ncol=3)
     fig.subplots_adjust(bottom=0.35)
     plt.grid(b=True)
-    if str(pca_comps) != 'None':
-        plt.title("Model: "+model_name + ", Class: " + category_name + ", PCA: " + str(pca_comps))
-    else:
-        plt.title("Model: "+model_name + ", Class: " + category_name)
+    plt.title("Model: "+model_name + ", Class: " + category_name)
 
     plt.xlabel("Classes")
-    plt.ylabel(bias_metric+" score")
-    if pca_comps == 'None':
-        pca_path = 'no_pca/'
-    else:
-        pca_path = 'pca/'
+    plt.ylabel("cosine score")
 
-    save = save_path + '/boxplots/'+ dataset_name + '/' + pca_path + bias_metric+'/'+category_name+'_filtered_'+bias_metric+'.pdf'
-    #plt.savefig(save_path + '/boxplots/' + category_name+'_filtered_'+ bias_metric+'.pdf')
+    save = save_path + '/boxplots/'+ dataset_name + '/' +category_name+'_filtered.pdf'
     plt.savefig(save, format='pdf')
 
-def plot_indiv_cats_comps(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_stats, comps_stats_ft, self_similarities_stats, self_similarities_stats_ft, category_name, category_features, bias_metric, pca_comps):
+def plot_indiv_cats_comps(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_stats, comps_stats_ft, self_similarities_stats, self_similarities_stats_ft, category_name, category_features):
     """Plots bias analysis experiment results for 'Comps' subset of classes: 
     'Comps' compares two classes --> man vs. surfboard, woman+car vs woman etc. (inter-class)
     
@@ -158,14 +148,8 @@ def plot_indiv_cats_comps(model_name, dataset_name, save_path, mins_maxes_pt, mi
                                  for features extracted from finetuned model
         category_name: Name of single class: 'car, surfboard, refrigerator' etc. --> config['INDIVIDUAL_PLOTS']['category_list']
         category_features: Classes to be plotted: config['INDIVIDUAL_PLOTS_COMPS'][category_name]
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
-        pca_comps: Whether to perform averaging on features that have been transformed with PCA
         
     """
-    if pca_comps == 'None':
-        pca_path = 'no_pca/'
-    else:
-        pca_path = 'pca/'
 
     y_dict = dict()
     y_dict_ft = dict()
@@ -191,7 +175,7 @@ def plot_indiv_cats_comps(model_name, dataset_name, save_path, mins_maxes_pt, mi
     y_ft = np.asarray(list(y_dict_comp.values()))
     spearman_coeff = stats.spearmanr(y, y_ft)
     spearman_save = {model_name:spearman_coeff}
-    np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/spearman_indiv.npy', spearman_save)
+    np.save(save_path+'/metric_data/'+ dataset_name + '/'+'spearman_indiv.npy', spearman_save)
 
 
 
@@ -242,21 +226,16 @@ def plot_indiv_cats_comps(model_name, dataset_name, save_path, mins_maxes_pt, mi
 
     plt.grid(b=True)
     fig.subplots_adjust(bottom=0.5)
-    if str(pca_comps) != 'None':
-        plt.title("Model: "+ model_name + " Finetuned on: " + dataset_name+", Class: "+ category_name + "\n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))+ ", PCA: " + str(pca_comps))
-    else:
-        plt.title("Model: "+model_name + " Finetuend on: " + dataset_name+", Class: "+ category_name + "\n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3)))
+
+    plt.title("Model: "+model_name + " Finetuend on: " + dataset_name+", Class: "+ category_name + "\n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3)))
 
 
     plt.xlabel("Classes")
-    plt.ylabel(bias_metric + " score")
+    plt.ylabel("cosine score")
 
 
-    save = save_path + '/boxplots/'+ dataset_name + '/'+pca_path + bias_metric+'/'+category_name+ '_comp_' + bias_metric+'.pdf'
-    #plt.savefig(save_path + '/boxplots/' + category_name+'_filtered_'+ bias_metric+'.pdf')
+    save = save_path + '/boxplots/'+ dataset_name + '/' +category_name+ '_comp.pdf'
     plt.savefig(save, format='pdf')
-
-    #plt.savefig(save_path + '/boxplots/' +category_name+ '_comp_' + bias_metric+'.pdf')
 
     fig2 = plt.figure()
     for i in range(len(y_dict)):
@@ -264,16 +243,11 @@ def plot_indiv_cats_comps(model_name, dataset_name, save_path, mins_maxes_pt, mi
     plt.legend(labels, bbox_to_anchor=(0.5, -0.5), loc='lower center', prop=fontP, ncol=3)
     plt.grid(b=True)
     fig2.subplots_adjust(bottom=0.35)
-    if str(pca_comps) != 'None':
-        plt.title("Model: " + model_name + " Finetuned on: " + dataset_name+ ", Class: "+ category_name +"\n (Finetuned - Pretrained)"+ ", PCA: " + str(pca_comps))
-    else:
-        plt.title("Model: " + model_name + " Finetuned on: " +dataset_name +", Class: "+ category_name +"\n (Finetuned - Pretrained)")
+
+    plt.title("Model: " + model_name + " Finetuned on: " +dataset_name +", Class: "+ category_name +"\n (Finetuned - Pretrained)")
 
     plt.xlabel("Classes")
-    plt.ylabel(bias_metric + " score")
+    plt.ylabel("cosine score")
 
-    save = save_path + '/boxplots/'+ dataset_name + '/'+pca_path + bias_metric+'/'+category_name+'_comp_diff_' + bias_metric+'.pdf'
-    #plt.savefig(save_path + '/boxplots/' + category_name+'_filtered_'+ bias_metric+'.pdf')
+    save = save_path + '/boxplots/'+ dataset_name + '/' +category_name+'_comp_diff.pdf'
     plt.savefig(save, format='pdf')
-
-    #plt.savefig(save_path + '/boxplots/' + category_name+'_comp_diff_' + bias_metric+'.pdf')

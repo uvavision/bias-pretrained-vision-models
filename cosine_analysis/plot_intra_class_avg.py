@@ -65,7 +65,7 @@ import pandas as pd
 fontP = FontProperties()
 fontP.set_size('small')
 
-def plot_indiv_categories_mult_trials(model_name, dataset_name, save_path, category_features, comps_stats, self_similarities_stats, category_name, bias_metric, pca_comps):
+def plot_indiv_categories_mult_trials(model_name, dataset_name, save_path, category_features, comps_stats, self_similarities_stats, category_name):
     """Plots bias analysis experiment results for 'Indiv' subset of classes averaged across trials for a model: 
     'Indiv': single classes --> man, woman, surfboard, car, refrigerator, etc. (intra-class)
     
@@ -80,10 +80,7 @@ def plot_indiv_categories_mult_trials(model_name, dataset_name, save_path, categ
         self_similarities_stats: Dictionary mapping class names (LABEL_NAMES in config) to a tuple of 
                                  (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() 
                                  for features extracted from pretrained model
-        category_name: Name of single class: 'car, surfboard, refrigerator' etc. --> config['INDIVIDUAL_PLOTS']['category_list']
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
-        pca_comps: Whether to use features that have been transformed with PCA
-        
+        category_name: Name of single class: 'car, surfboard, refrigerator' etc. --> config['INDIVIDUAL_PLOTS']['category_list']        
     """
     y = []
     yerr_vals = []
@@ -118,18 +115,10 @@ def plot_indiv_categories_mult_trials(model_name, dataset_name, save_path, categ
                 array=yerr[1],
                 arrayminus=yerr[0])
             ))
-    if str(pca_comps) != 'None':
-        title = "Averaged, Model: "+model_name + ", Class: " + category_name + ", PCA: " + str(pca_comps)
-    else:
-        title = "Averaged, Model: "+model_name + ", Class: " + category_name
+    title = "Averaged, Model: "+model_name + ", Class: " + category_name
 
     plt.xlabel("Classes")
-    plt.ylabel(bias_metric+" score")
-
-    if pca_comps == 'None':
-        pca_path = 'no_pca/'
-    else:
-        pca_path = 'pca/'
+    plt.ylabel("cosine score")
 
     fig.update_layout(
         title={
@@ -147,7 +136,7 @@ def plot_indiv_categories_mult_trials(model_name, dataset_name, save_path, categ
             showgrid=True  # Removes X-axis grid lines
         ),
         yaxis=dict(
-            title=bias_metric + " score",  
+            title="cosine score",  
             linecolor="#BCCCDC",  # Sets color of Y-axis line
             showgrid=True,  # Removes Y-axis grid lines    
         ),
@@ -160,12 +149,11 @@ def plot_indiv_categories_mult_trials(model_name, dataset_name, save_path, categ
     fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgray')
 
 
-    save = save_path + '/boxplots/'+ dataset_name + '/'+pca_path + bias_metric+'/'+category_name+'_filtered_'+bias_metric+'_averaged.pdf'
-    #plt.savefig(save_path + '/boxplots/' + category_name+'_filtered_'+ bias_metric+'.pdf')
+    save = save_path + '/boxplots/'+ dataset_name + '/' +category_name+'_filtered_averaged.pdf'
     fig.write_image(save)
 
 
-def plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_stats, comps_stats_ft, self_similarities_stats, self_similarities_stats_ft, category_name, category_features, bias_metric, pca_comps):
+def plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_stats, comps_stats_ft, self_similarities_stats, self_similarities_stats_ft, category_name, category_features):
     """Plots bias analysis experiment results for 'Comps' subset of classes averaged across trials for a model: 
     'Comps' compares two classes --> man vs. surfboard, woman+car vs woman etc. (inter-class)
     
@@ -199,8 +187,6 @@ def plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_
                                  for features extracted from finetuned model
         category_name: Name of single class: 'car, surfboard, refrigerator' etc. --> config['INDIVIDUAL_PLOTS']['category_list']
         category_features: Classes to be plotted: config['INDIVIDUAL_PLOTS_COMPS'][category_name]
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
-        pca_comps: Whether to perform averaging on features that have been transformed with PCA
         
     """
     y_dict = dict()
@@ -288,10 +274,7 @@ def plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_
 
     fig.add_trace(trace)
 
-    if str(pca_comps) != 'None':
-        title = "Averaged, Model: "+ model_name + " Finetuned on: " + dataset_name+", Class: "+ category_name + "<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))+ ", PCA: " + str(pca_comps)
-    else:
-        title = "Averaged, Model: "+model_name + " Finetuend on: " + dataset_name+", Class: "+ category_name + "<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
+    title = "Averaged, Model: "+model_name + " Finetuend on: " + dataset_name+", Class: "+ category_name + "<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
 
     fig.update_layout(
         title={
@@ -309,7 +292,7 @@ def plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_
             showgrid=True  # Removes X-axis grid lines
         ),
         yaxis=dict(
-            title=bias_metric + " score",  
+            title="cosine score",  
             linecolor="#BCCCDC",  # Sets color of Y-axis line
             showgrid=True,  # Removes Y-axis grid lines    
         ),
@@ -319,14 +302,10 @@ def plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_
             xanchor="right",
             x=0.99
         ))
-    if pca_comps == 'None':
-        pca_path = 'no_pca/'
-    else:
-        pca_path = 'pca/'
     colors = ['r', 'g', 'b', 'c', 'm', 'lime', 'orange', 'steelblue', 'silver', 'turquoise', 'violet', 'gold', 'lawngreen', 'pink', 'deepskyblue', 'palegreen', 'peachpuff', 'dodgerblue', 'peru', 'tomato']
     fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgray')
 
-    save = save_path + '/boxplots/'+ dataset_name + '/'+pca_path + bias_metric+'/'+category_name+ '_comp_' + bias_metric+'_averaged.pdf'
+    save = save_path + '/boxplots/'+ dataset_name +category_name+ '_comp_averaged.pdf'
     fig.write_image(save)
     fig2 = plt.figure()
     for i in range(len(y_dict)):
@@ -334,14 +313,12 @@ def plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_
     plt.legend(labels, bbox_to_anchor=(0.5, -0.5), loc='lower center', prop=fontP, ncol=3)
     plt.grid(b=True)
     fig2.subplots_adjust(bottom=0.35)
-    if str(pca_comps) != 'None':
-        plt.title("Averaged, Model: " + model_name + " Finetuned on: " + dataset_name+ ", Class: "+ category_name +"\n (Finetuned - Pretrained)"+ ", PCA: " + str(pca_comps))
-    else:
-        plt.title("Averaged, Model: " + model_name + " Finetuned on: " +dataset_name +", Class: "+ category_name +"\n (Finetuned - Pretrained)")
+
+    plt.title("Averaged, Model: " + model_name + " Finetuned on: " +dataset_name +", Class: "+ category_name +"\n (Finetuned - Pretrained)")
 
 
     plt.xlabel("Classes")
-    plt.ylabel(bias_metric + " score")
+    plt.ylabel("cosine score")
 
-    save = save_path + '/boxplots/'+ dataset_name + '/'+pca_path + bias_metric+'/'+category_name+'_comp_diff_' + bias_metric+'_averaged.pdf'
+    save = save_path + '/boxplots/'+ dataset_name + '/' +category_name+'_comp_diff_averaged.pdf'
     plt.savefig(save, format='pdf')

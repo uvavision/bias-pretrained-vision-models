@@ -65,7 +65,7 @@ import pandas as pd
 fontP = FontProperties()
 fontP.set_size('small')
 
-def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_stats, comps_stats_ft, self_similarities_stats, self_similarities_stats_ft, category_features, plot_type, bias_metric, pca_comps):
+def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_stats, comps_stats_ft, self_similarities_stats, self_similarities_stats_ft, category_features, plot_type):
     """Plots bias analysis experiment results for different subset of classes averaging across all trials for a model
     'Indiv': single classes --> man, woman, surfboard, car, refrigerator, etc. (intra-class)
     'Pairs': multi-label --> man+surfboard, woman+car, etc. (intra-class)
@@ -101,8 +101,6 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
                                  for features extracted from finetuned model
         category_features: Classes to be plotted
         plot_type: Indiv, Pairs, Comps --> subset of classes in analysis set
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
-        pca_comps: Whether to perform averaging on features that have been transformed with PCA
         
     """
     y_dict = dict()
@@ -186,73 +184,42 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
             )
     fig.add_trace(trace)
 
-    if pca_comps == 'None':
-        pca_path = 'no_pca/'
-    else:
-        pca_path = 'pca/'
-
-
     # plt.legend(labels, loc='lower left', ncol=12)
     if plot_type == 'pairs':
-        if str(pca_comps) != 'None':
-            title = "Averaged Paired Classes, Model: "+ model_name + " Finetuned on: " +dataset_name+" <br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))+ ", PCA: " + str(pca_comps)
-            title_diff = "Averaged, Model: "+model_name + " Finetuned on: " + dataset_name+ ", Paired Classes (Finetuned - Pretrained), PCA: " + str(pca_comps)
-        else:
-            title = "Averaged Paired Classes, Model: "+ model_name + " Finetuned on: " + dataset_name + "<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
-            title_diff = "Averaged, Model: "+model_name + " Finetuned on: " + dataset_name + ", Paired Classes (Finetuned - Pretrained)"
-        #save = save_path + '/boxplots/pairs_'+bias_metric+ '.pdf'
-        save = save_path + '/boxplots/'+ dataset_name + '/'+pca_path+bias_metric+'/pairs_'+bias_metric+ '_averaged.pdf'
-        #save_diff = save_path + '/boxplots/pairs_diff_' + bias_metric+ '.pdf'
-        save_diff = save_path + '/boxplots/' + dataset_name + '/'+ pca_path + bias_metric+'/pairs_diff_' + bias_metric+ '_averaged.pdf'
+
+        title = "Averaged Paired Classes, Model: "+ model_name + " Finetuned on: " + dataset_name + "<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
+        title_diff = "Averaged, Model: "+model_name + " Finetuned on: " + dataset_name + ", Paired Classes (Finetuned - Pretrained)"
+        save = save_path + '/boxplots/'+ dataset_name + '/'+'pairs_averaged.pdf'
+        save_diff = save_path + '/boxplots/' + dataset_name + '/' +'pairs_diff_averaged.pdf'
         bbox = (0.5, -0.65)
         bottom_legend = -0.75
         bottom = 0.5
-        #plot_save_info = pd.DataFrame([labels, y, temp_errs_mins, temp_errs_maxes, y_ft, temp_errs_ft_mins, temp_errs_ft_maxes], columns=['classes', 'pt_means', 'pt_mins', 'pt_maxes', 'ft_means', 'ft_mins', 'ft_maxes']).to_csv(save_path+'/metric_data/'+pca_path+bias_metric+'/pairs_plot.csv', index=False)
-        plot_save_info = pd.DataFrame({'classes':labels, 'pt_means':y, 'pt_mins':temp_errs_mins, 'pt_maxes':temp_errs_maxes, 'ft_means':y_ft, 'ft_mins':temp_errs_ft_mins, 'ft_maxes':temp_errs_ft_maxes}).to_csv(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/pairs_plot.csv', index=False)
+        plot_save_info = pd.DataFrame({'classes':labels, 'pt_means':y, 'pt_mins':temp_errs_mins, 'pt_maxes':temp_errs_maxes, 'ft_means':y_ft, 'ft_mins':temp_errs_ft_mins, 'ft_maxes':temp_errs_ft_maxes}).to_csv(save_path+'/metric_data/'+ dataset_name + '/'+'pairs_plot.csv', index=False)
     elif plot_type == 'comps':
-        if str(pca_comps) != 'None':
-            title = "Averaged Comparison Classes, Model: "+ model_name + " Finetuned on: " + dataset_name + "<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))+ ", PCA: " + str(pca_comps)
-            title_diff = "Averaged, Model: "+model_name + " Finetuned, Comparison Classes (Finetuned - Pretrained), PCA: " + str(pca_comps)
-        else:
-            title = "Averaged Comparison Classes, Model: "+ model_name + " Finetuned on: " + dataset_name +"<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
-            title_diff = "Averaged, Model: "+model_name + " Finetuned on: " + dataset_name +", Comparison Classes (Finetuned - Pretrained)"
-        #save = save_path + '/boxplots/comps_' + bias_metric+ '.pdf'
-        save = save_path + '/boxplots/'+ dataset_name + '/'+pca_path +bias_metric+ '/comps_' + bias_metric+ '_averaged.pdf'
-        #save_diff = save_path + '/boxplots/comps_diff_' + bias_metric+'.pdf'
-        save_diff = save_path + '/boxplots/'+ dataset_name + '/'+pca_path+bias_metric+'/comps_diff_' + bias_metric+'_averaged.pdf'
+        title = "Averaged Comparison Classes, Model: "+ model_name + " Finetuned on: " + dataset_name +"<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
+        title_diff = "Averaged, Model: "+model_name + " Finetuned on: " + dataset_name +", Comparison Classes (Finetuned - Pretrained)"
+        save = save_path + '/boxplots/'+ dataset_name + '/' + 'comps_averaged.pdf'
+        save_diff = save_path + '/boxplots/'+ dataset_name + '/'+'comps_diff_averaged.pdf'
         bbox = (0.5, -0.75)
         bottom_legend = -1.0
         bottom = 0.5
-        plot_save_info = pd.DataFrame({'classes':labels, 'pt_means':y, 'pt_mins':temp_errs_mins, 'pt_maxes':temp_errs_maxes, 'ft_means':y_ft, 'ft_mins':temp_errs_ft_mins, 'ft_maxes':temp_errs_ft_maxes}).to_csv(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/comps_plot.csv', index=False)
+        plot_save_info = pd.DataFrame({'classes':labels, 'pt_means':y, 'pt_mins':temp_errs_mins, 'pt_maxes':temp_errs_maxes, 'ft_means':y_ft, 'ft_mins':temp_errs_ft_mins, 'ft_maxes':temp_errs_ft_maxes}).to_csv(save_path+'/metric_data/'+ dataset_name + '/'+'comps_plot.csv', index=False)
 
     elif plot_type == 'indiv':
-        if str(pca_comps) != 'None':
-            title = "Averaged Individual Classes, Model: "+ model_name + " Finetuned on: " + dataset_name +"<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))+ ", PCA: " + str(pca_comps)
-            title_diff = "Averaged, Model: "+model_name +" Finetuned on: " + dataset_name + ", Individual Classes (Finetuned - Pretrained), PCA: " + str(pca_comps)
-        else:
-            title = "Averaged Individual Classes, Model: "+ model_name + " Finetuned on: " + dataset_name +"<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
-            title_diff = "Averaged, Model: "+model_name +" Finetuned on: " + dataset_name + ", Individual Classes (Finetuned - Pretrained)"
-        #save = save_path + '/boxplots/indv_' + bias_metric +'.pdf'
-        #save_diff = save_path + '/boxplots/indv_diff_' + bias_metric+'.pdf'    
-        save = save_path + '/boxplots/' + dataset_name + '/'+pca_path+bias_metric+'/indv_' + bias_metric +'_averaged.pdf'
-        save_diff = save_path + '/boxplots/'+ dataset_name + '/' + pca_path + bias_metric+ '/indv_diff_' + bias_metric+'_averaged.pdf'  
+        title = "Averaged Individual Classes, Model: "+ model_name + " Finetuned on: " + dataset_name +"<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
+        title_diff = "Averaged, Model: "+model_name +" Finetuned on: " + dataset_name + ", Individual Classes (Finetuned - Pretrained)"
+        save = save_path + '/boxplots/' + dataset_name + '/'+'indv_averaged.pdf'
+        save_diff = save_path + '/boxplots/'+ dataset_name + '/' + 'indv_diff_averaged.pdf'  
         bbox = (0.5, -0.65)
         bottom_legend = -0.6
         bottom = 0.5
-        #plot_save_info = pd.DataFrame([labels, y, temp_errs_mins, temp_errs_maxes, y_ft, temp_errs_ft_mins, temp_errs_ft_maxes], columns=['classes', 'pt_means', 'pt_mins', 'pt_maxes', 'ft_means', 'ft_mins', 'ft_maxes']).to_csv(save_path+'/metric_data/'+pca_path+bias_metric+'/indiv_plot.csv', index=False)
-        plot_save_info = pd.DataFrame({'classes':labels, 'pt_means':y, 'pt_mins':temp_errs_mins, 'pt_maxes':temp_errs_maxes, 'ft_means':y_ft, 'ft_mins':temp_errs_ft_mins, 'ft_maxes':temp_errs_ft_maxes}).to_csv(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/indiv_plot.csv', index=False)
+        plot_save_info = pd.DataFrame({'classes':labels, 'pt_means':y, 'pt_mins':temp_errs_mins, 'pt_maxes':temp_errs_maxes, 'ft_means':y_ft, 'ft_mins':temp_errs_ft_mins, 'ft_maxes':temp_errs_ft_maxes}).to_csv(save_path+'/metric_data/'+ dataset_name + '/'+'indiv_plot.csv', index=False)
 
     else:
-        if str(pca_comps) != 'None':
-            title = "Averaged Class vs. Gender, Model: "+ model_name + " Finetuned on: " + dataset_name +"<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))+ ", PCA: " + str(pca_comps)
-            title_diff = "Averaged, Model: "+model_name +" Finetuned on: " + dataset_name + ", Class vs. Gender Classes (Finetuned - Pretrained), PCA: " + str(pca_comps)
-        else:
-            title = "Averaged Class vs. Gender, Model: "+ model_name + " Finetuned on: " + dataset_name +"<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
-            title_diff = "Averaged, Model: "+model_name + " Finetuned on: " + dataset_name +", Class vs. Gender (Finetuned - Pretrained)"
-        #save = save_path + '/boxplots/object_comp_'+ bias_metric+'.pdf'
-        #save_diff = save_path + '/boxplots/object_comp_diffs_' + bias_metric +'.pdf'
-        save = save_path + '/boxplots/' + dataset_name + '/'+ pca_path +bias_metric + '/object_comp_'+ bias_metric+'_averaged.pdf'
-        save_diff = save_path + '/boxplots/' + dataset_name + '/'+pca_path + bias_metric + '/object_comp_diffs_' + bias_metric +'_averaged.pdf'
+        title = "Averaged Class vs. Gender, Model: "+ model_name + " Finetuned on: " + dataset_name +"<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
+        title_diff = "Averaged, Model: "+model_name + " Finetuned on: " + dataset_name +", Class vs. Gender (Finetuned - Pretrained)"
+        save = save_path + '/boxplots/' + dataset_name + '/' + 'object_comp_averaged.pdf'
+        save_diff = save_path + '/boxplots/' + dataset_name + '/' + 'object_comp_diffs_averaged.pdf'
         bbox = (0.5, -0.65)
         bottom_legend = -0.9
         bottom = 0.5
@@ -273,7 +240,7 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
             showgrid=True  # Removes X-axis grid lines
         ),
         yaxis=dict(
-            title=bias_metric + " score",  
+            title="cosine score",  
             linecolor="#BCCCDC",  # Sets color of Y-axis line
             showgrid=True,  # Removes Y-axis grid lines    
         ),
@@ -300,7 +267,7 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
 
     plt.title(title_diff)
     plt.xlabel("Classes")
-    plt.ylabel(bias_metric+" score")
+    plt.ylabel("cosine score")
     plt.savefig(save_diff, format='pdf')
 
 def get_multiple_trials_stats(list_dicts):

@@ -110,12 +110,11 @@ def distance_correlation_function(a, b):
     distance = dcor.distance_correlation(a, b)
     return np.mean(distance), np.std(distance)
 
-def split_features(features, bias_metric):
+def split_features(features):
     """Calculates intra-class similarity for a set of features by randomly permuting and splitting
     
     Args:
         features: Tensor of features of shape: N x d where N is the number of examples and d is dimensionality
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
     
     Returns mean and standard deviation of bias metric
     """
@@ -126,14 +125,14 @@ def split_features(features, bias_metric):
     split = np_features[np.random.permutation(np.arange(np_features.shape[0]))]
     shape = split.shape[0]//2
     split1, split2 = split[:shape], split[shape:]
-    if bias_metric == 'cosine':
-        similarity, standard_deviation = cosine_similarity_function(split1, split2)
-    elif bias_metric == 'euclidean':
-        similarity, standard_deviation = euclidean_function(split1, split2)
-    elif bias_metric == 'correlation':
-        similarity, standard_deviation = distance_correlation_function(split1, split2)
-    else:
-        print("Bias metric not implemented")
+    #if bias_metric == 'cosine':
+    similarity, standard_deviation = cosine_similarity_function(split1, split2)
+    #elif bias_metric == 'euclidean':
+        #similarity, standard_deviation = euclidean_function(split1, split2)
+    #elif bias_metric == 'correlation':
+        #similarity, standard_deviation = distance_correlation_function(split1, split2)
+    #else:
+        #print("Bias metric not implemented")
     return similarity, standard_deviation
 
 def random_split_two_features(features_one, features_two):
@@ -195,13 +194,12 @@ def inter_class_similarity(features_one, features_two, num_iter):
     
     return cosine_similarities, standard_deviations, std_similarity, mean_similarity, t_test
 
-def intra_class_similarity(features, num_iter, bias_metric):
+def intra_class_similarity(features, num_iter):
     """Calculates intra-class similarity for single set of features corresponding to one class
     
     Args:
         features: Tensor of features of shape: N x d where N is the number of examples and d is dimensionality
         num_iter: Integer specifying number of iterations to compute the bias metric for, set to 50
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
     
     Returns:
         cosine_similarities: List (length=num_iters) of cosine similarities from each iteration of running inter-class similarity
@@ -214,7 +212,7 @@ def intra_class_similarity(features, num_iter, bias_metric):
     cosine_similarities = []
     standard_deviations = []
     for i in range(num_iter):
-        similarity, std = split_features(features, bias_metric)
+        similarity, std = split_features(features)
         cosine_similarities.append(similarity)
         standard_deviations.append(std)
     std_similarity = np.std(cosine_similarities)
@@ -229,13 +227,12 @@ def intra_class_similarity(features, num_iter, bias_metric):
     return cosine_similarities, standard_deviations, std_similarity, mean_similarity, t_test
 
 
-def intra_class_similarity_error_bars(features, num_iter, bias_metric):
+def intra_class_similarity_error_bars(features, num_iter):
     """Calculates error bars for intra-class similarity for single set of features corresponding to one class
     
     Args:
         features: Tensor of features of shape: N x d where N is the number of examples and d is dimensionality
         num_iter: Integer specifying number of iterations to compute the bias metric for, set to 50
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
     
     Returns a list of the min and max of the cosine similarities 
 
@@ -243,7 +240,7 @@ def intra_class_similarity_error_bars(features, num_iter, bias_metric):
     cosine_similarities = []
     standard_deviations = []
     for i in range(num_iter):
-        similarity, std = split_features(features, bias_metric)
+        similarity, std = split_features(features)
         cosine_similarities.append(similarity)
         standard_deviations.append(std)
     std_similarity = np.std(cosine_similarities)
@@ -276,7 +273,7 @@ def inter_class_similarity_error_bars(features_one, features_two, num_iter):
     
     return [min(cosine_similarities), max(cosine_similarities)]
 
-def multiple_trials_exp(model_name, save_path, train_dataset, dataset_name, config_path, bias_metric, pca_comps):
+def multiple_trials_exp(model_name, save_path, train_dataset, dataset_name, config_path):
     """Averages intra-class and inter-class similarity across all trial runs for a model and plots/saves the resulting plots
     
     Args:
@@ -285,14 +282,8 @@ def multiple_trials_exp(model_name, save_path, train_dataset, dataset_name, conf
         train_dataset: Dataset the model has originally been trained on
         dataset_name: Analysis set
         config_path: Path to config file for analysis set
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
-        pca_comps: Whether to perform averaging on features that have been transformed with PCA
 
     """
-    if pca_comps == 'None':
-        pca_path = 'no_pca/'
-    else:
-        pca_path = 'pca/'
 
     base_path = 'experiments/'+ train_dataset+'/'+model_name
     contents = os.listdir(base_path) 
@@ -302,12 +293,12 @@ def multiple_trials_exp(model_name, save_path, train_dataset, dataset_name, conf
     all_comps_sim_ft = []
     for i in contents:
         if i != 'orig' and i != '.ipynb_checkpoints' and i != 'averaged':
-            dir = os.listdir(base_path+'/'+i+'/features/' +dataset_name +'/finetuned_features'+'/'+pca_path)
+            dir = os.listdir(base_path+'/'+i+'/features/' +dataset_name +'/finetuned_features/')
             if len(dir) != 0:
-                self_similarities_pt = np.load(base_path+'/'+i+'/metric_data/' + dataset_name + '/'+pca_path + bias_metric+'/self_similarities_pt.npy', allow_pickle=True)
-                self_similarities_ft = np.load(base_path+'/'+i+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_ft.npy', allow_pickle=True)
-                comps_similarities_pt = np.load(base_path+'/'+i+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/comps_similarities_pt.npy', allow_pickle=True)
-                comps_similarities_ft = np.load(base_path+'/'+i+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/comps_similarities_ft.npy', allow_pickle=True)
+                self_similarities_pt = np.load(base_path+'/'+i+'/metric_data/' + dataset_name + '/' +'self_similarities_pt.npy', allow_pickle=True)
+                self_similarities_ft = np.load(base_path+'/'+i+'/metric_data/'+ dataset_name + '/'+'self_similarities_ft.npy', allow_pickle=True)
+                comps_similarities_pt = np.load(base_path+'/'+i+'/metric_data/'+ dataset_name + '/'+'comps_similarities_pt.npy', allow_pickle=True)
+                comps_similarities_ft = np.load(base_path+'/'+i+'/metric_data/'+ dataset_name + '/'+'comps_similarities_ft.npy', allow_pickle=True)
 
                 all_self_sim_pt.append(self_similarities_pt.item())
                 all_self_sim_ft.append(self_similarities_ft.item())
@@ -318,17 +309,17 @@ def multiple_trials_exp(model_name, save_path, train_dataset, dataset_name, conf
     final_comps_similarities_pt, mins_maxes_comps_pt = get_multiple_trials_stats(all_comps_sim_pt)
     final_comps_similarities_ft, mins_maxes_comps_ft = get_multiple_trials_stats(all_comps_sim_ft)
 
-    np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_pt_averaged.npy', final_self_similarities_pt)
-    np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_pt_mins_maxes_averaged.npy', mins_maxes_pt)
+    np.save(save_path+'/metric_data/'+ dataset_name + '/'+'self_similarities_pt_averaged.npy', final_self_similarities_pt)
+    np.save(save_path+'/metric_data/'+ dataset_name + '/'+'self_similarities_pt_mins_maxes_averaged.npy', mins_maxes_pt)
 
-    np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_ft_averaged.npy', final_self_similarities_ft)
-    np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_ft_mins_maxes_averaged.npy', mins_maxes_ft)
+    np.save(save_path+'/metric_data/'+ dataset_name + '/'+'self_similarities_ft_averaged.npy', final_self_similarities_ft)
+    np.save(save_path+'/metric_data/'+ dataset_name + '/'+'self_similarities_ft_mins_maxes_averaged.npy', mins_maxes_ft)
 
-    np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_comps_pt_averaged.npy', final_comps_similarities_pt)
-    np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_comps_pt_mins_maxes_averaged.npy', mins_maxes_comps_pt)
+    np.save(save_path+'/metric_data/'+ dataset_name + '/'+'self_similarities_comps_pt_averaged.npy', final_comps_similarities_pt)
+    np.save(save_path+'/metric_data/'+ dataset_name + '/'+'self_similarities_comps_pt_mins_maxes_averaged.npy', mins_maxes_comps_pt)
 
-    np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_comps_ft_averaged.npy', final_comps_similarities_ft)
-    np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_comps_ft_mins_maxes_averaged.npy', mins_maxes_comps_ft)
+    np.save(save_path+'/metric_data/'+ dataset_name + '/'+'self_similarities_comps_ft_averaged.npy', final_comps_similarities_ft)
+    np.save(save_path+'/metric_data/'+ dataset_name + '/'+'self_similarities_comps_ft_mins_maxes_averaged.npy', mins_maxes_comps_ft)
 
 
     # Plot results from multiple trials
@@ -338,13 +329,13 @@ def multiple_trials_exp(model_name, save_path, train_dataset, dataset_name, conf
     individual_plots_cats = config['INDIVIDUAL_PLOTS']['category_list']
     # TODO in the following plots, fix the title and save paths 
     for cat in individual_plots_cats:
-        plot_indiv_categories_mult_trials(model_name, dataset_name, save_path, config['INDIVIDUAL_PLOTS'][cat], final_comps_similarities_pt, final_self_similarities_pt, cat, bias_metric, pca_comps)
-        plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, final_comps_similarities_pt, final_comps_similarities_ft, final_self_similarities_pt, final_self_similarities_ft, cat, config['INDIVIDUAL_PLOTS_COMPS'][cat], bias_metric, pca_comps)
+        plot_indiv_categories_mult_trials(model_name, dataset_name, save_path, config['INDIVIDUAL_PLOTS'][cat], final_comps_similarities_pt, final_self_similarities_pt, cat)
+        plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, final_comps_similarities_pt, final_comps_similarities_ft, final_self_similarities_pt, final_self_similarities_ft, cat, config['INDIVIDUAL_PLOTS_COMPS'][cat])
     for misc in config['MISC_PLOTS']['misc_plots_names']:
-        plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, final_comps_similarities_pt, final_comps_similarities_ft, final_self_similarities_pt, final_self_similarities_ft, config['MISC_PLOTS'][misc], misc, bias_metric, pca_comps)
+        plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, final_comps_similarities_pt, final_comps_similarities_ft, final_self_similarities_pt, final_self_similarities_ft, config['MISC_PLOTS'][misc], misc)
 
 
-def run_experiment(model_name, save_path, train_dataset, dataset_name, config_path, bias_metric, pca_comps, features=None, only_pretrained=False, multiple_trials=False):
+def run_experiment(model_name, save_path, train_dataset, dataset_name, config_path, features=None, only_pretrained=False, multiple_trials=False):
     """Runs the bias analysis experiment on a model trial
     
     Args:
@@ -354,8 +345,6 @@ def run_experiment(model_name, save_path, train_dataset, dataset_name, config_pa
         dataset_name: Analysis set
         features: Dictionary mapping class name to feature tensor of size N x d where N is the number of examples in the clasz
         config_path: Path to config file for analysis set
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
-        pca_comps: Whether to perform averaging on features that have been transformed with PCA
         only_pretrained: If True, only performs experiment on features that have been extracted from pretrained version of the model
         multiple_trials: If True, performs bias analysis experiment across all trial runs for a given model 
         
@@ -366,11 +355,6 @@ def run_experiment(model_name, save_path, train_dataset, dataset_name, config_pa
     comps = config['COMPS']
 
     NUM_ITER = 50
-    if pca_comps == 0.0:
-        pca_comps = 'None'
-        pca_path = 'no_pca/'
-    else:
-        pca_path = 'pca/'
     
     individual_plots_cats = config['INDIVIDUAL_PLOTS']['category_list']
 
@@ -397,15 +381,15 @@ def run_experiment(model_name, save_path, train_dataset, dataset_name, config_pa
 
         for feature in features:
             # generates pretrained and finetuned
-            cos, std, sim_std, sim_mean, t_test = intra_class_similarity(features[feature], NUM_ITER, bias_metric)
+            cos, std, sim_std, sim_mean, t_test = intra_class_similarity(features[feature], NUM_ITER)
             if feature.endswith("_pt"):
                 self_similarities_stats_pt[labels[feature[:-3]]] = (cos, std, sim_std, sim_mean)
                 self_similarities_stats_pt_significance[labels[feature[:-3]]] = t_test
-                mins_maxes_pt[labels[feature[:-3]]] = intra_class_similarity_error_bars(features[feature], NUM_ITER, bias_metric) # keys are labels_names in config
+                mins_maxes_pt[labels[feature[:-3]]] = intra_class_similarity_error_bars(features[feature], NUM_ITER) # keys are labels_names in config
             else:
                 self_similarities_stats_ft[labels[feature[:-3]]] = (cos, std, sim_std, sim_mean)
                 self_similarities_stats_ft_significance[labels[feature[:-3]]] = t_test
-                mins_maxes_ft[labels[feature[:-3]]] = intra_class_similarity_error_bars(features[feature], NUM_ITER, bias_metric) # keys are labels_names in config
+                mins_maxes_ft[labels[feature[:-3]]] = intra_class_similarity_error_bars(features[feature], NUM_ITER) # keys are labels_names in config
 
         for comp in comps:
             # comps[comp] is a list of comparisons
@@ -422,25 +406,21 @@ def run_experiment(model_name, save_path, train_dataset, dataset_name, config_pa
                 errorbars_ft = inter_class_similarity_error_bars(features[comps[comp][0]+"_ft"], features[comps[comp][1]+"_ft"], NUM_ITER)
                 mins_maxes_comps_ft[comp] = errorbars_ft
 
-        np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_pt.npy', self_similarities_stats_pt)
-        np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/self_similarities_ft.npy', self_similarities_stats_ft)
-        np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/comps_similarities_pt.npy', comps_similarities_stats_pt)
-        np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/comps_similarities_ft.npy', comps_similarities_stats_ft)
+        np.save(save_path+'/metric_data/'+ dataset_name + '/'+'self_similarities_pt.npy', self_similarities_stats_pt)
+        np.save(save_path+'/metric_data/'+ dataset_name + '/'+'self_similarities_ft.npy', self_similarities_stats_ft)
+        np.save(save_path+'/metric_data/'+ dataset_name + '/'+'comps_similarities_pt.npy', comps_similarities_stats_pt)
+        np.save(save_path+'/metric_data/'+ dataset_name + '/'+'comps_similarities_ft.npy', comps_similarities_stats_ft)
         
-        np.save(save_path + '/boxplots/'+ dataset_name + '/' + pca_path + bias_metric + '/'+'self_similarities_pt_significance.npy', self_similarities_stats_pt_significance)
-        np.save(save_path + '/boxplots/' + dataset_name + '/'+ pca_path + bias_metric + '/'+'self_similarities_ft_significance.npy', self_similarities_stats_ft_significance)
-        np.save(save_path + '/boxplots/' + dataset_name + '/'+ pca_path + bias_metric + '/'+'comps_similarities_pt_significance.npy', comps_similarities_stats_pt_significance)
-        np.save(save_path + '/boxplots/' + dataset_name + '/'+ pca_path + bias_metric + '/'+'comps_similarities_ft_significance.npy', comps_similarities_stats_ft_significance)
+        np.save(save_path + '/boxplots/'+ dataset_name + '/' + 'self_similarities_pt_significance.npy', self_similarities_stats_pt_significance)
+        np.save(save_path + '/boxplots/' + dataset_name + '/' + 'self_similarities_ft_significance.npy', self_similarities_stats_ft_significance)
+        np.save(save_path + '/boxplots/' + dataset_name + '/' + 'comps_similarities_pt_significance.npy', comps_similarities_stats_pt_significance)
+        np.save(save_path + '/boxplots/' + dataset_name + '/' + 'comps_similarities_ft_significance.npy', comps_similarities_stats_ft_significance)
 
     
     if only_pretrained == True:
         for cat in individual_plots_cats:
-            plot_indiv_categories(model_name, dataset_name, save_path, config['INDIVIDUAL_PLOTS'][cat], comps_similarities_stats_pt, self_similarities_stats_pt, cat, bias_metric, pca_comps)
-            #if trend_analysis==True:
-                #trend_analysis_setup(only_pretrained, dataset_name, config, finetune, pca_comps, bias_metric)
+            plot_indiv_categories(model_name, dataset_name, save_path, config['INDIVIDUAL_PLOTS'][cat], comps_similarities_stats_pt, self_similarities_stats_pt, cat)
     else:
-        #if trend_analysis==True:
-            #trend_analysis_setup(only_pretrained, dataset_name, config, finetune, pca_comps, bias_metric)
         if multiple_trials == True:
             if not os.path.isdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'):
                 os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged', mode=0o777)
@@ -448,31 +428,31 @@ def run_experiment(model_name, save_path, train_dataset, dataset_name, config_pa
                 os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots', mode=0o777)
 
                 os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'metric_data/' + 'openimages', mode=0o777)
-                os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'metric_data/'+'openimages'+'/'+'no_pca', mode=0o777)
-                os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'metric_data/'+'openimages'+'/'+'no_pca'+'/'+'cosine', mode=0o777)
+                #os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'metric_data/'+'openimages'+'/'+'no_pca', mode=0o777)
+                #os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'metric_data/'+'openimages'+'/'+'no_pca'+'/'+'cosine', mode=0o777)
 
                 os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'metric_data/'+'coco', mode=0o777)
-                os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'metric_data/'+'coco'+'/'+'no_pca', mode=0o777)
-                os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'metric_data/'+'coco'+'/'+'no_pca'+'/'+'cosine', mode=0o777)
+                #os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'metric_data/'+'coco'+'/'+'no_pca', mode=0o777)
+                #os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'metric_data/'+'coco'+'/'+'no_pca'+'/'+'cosine', mode=0o777)
 
                 os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots/' + 'openimages', mode=0o777)
-                os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots/'+'openimages'+'/'+'no_pca', mode=0o777)
-                os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots/'+'openimages'+'/'+'no_pca'+'/'+'cosine', mode=0o777)
+                #os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots/'+'openimages'+'/'+'no_pca', mode=0o777)
+                #os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots/'+'openimages'+'/'+'no_pca'+'/'+'cosine', mode=0o777)
 
                 os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots/'+'coco', mode=0o777)
-                os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots/'+'coco'+'/'+'no_pca', mode=0o777)
-                os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots/'+'coco'+'/'+'no_pca'+'/'+'cosine', mode=0o777)
+                #os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots/'+'coco'+'/'+'no_pca', mode=0o777)
+                #os.mkdir('experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'+'/'+'boxplots/'+'coco'+'/'+'no_pca'+'/'+'cosine', mode=0o777)
 
 
 
             save_path_mult = 'experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'
-            multiple_trials_exp(model_name, save_path_mult, train_dataset, dataset_name, config_path, bias_metric, pca_comps)
+            multiple_trials_exp(model_name, save_path_mult, train_dataset, dataset_name, config_path)
         else:
             for cat in individual_plots_cats:
-                plot_indiv_categories(model_name, dataset_name, save_path, config['INDIVIDUAL_PLOTS'][cat], comps_similarities_stats_pt, self_similarities_stats_pt, cat, bias_metric, pca_comps)
-                plot_indiv_cats_comps(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_similarities_stats_pt, comps_similarities_stats_ft, self_similarities_stats_pt, self_similarities_stats_ft, cat, config['INDIVIDUAL_PLOTS_COMPS'][cat], bias_metric, pca_comps)
+                plot_indiv_categories(model_name, dataset_name, save_path, config['INDIVIDUAL_PLOTS'][cat], comps_similarities_stats_pt, self_similarities_stats_pt, cat)
+                plot_indiv_cats_comps(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_similarities_stats_pt, comps_similarities_stats_ft, self_similarities_stats_pt, self_similarities_stats_ft, cat, config['INDIVIDUAL_PLOTS_COMPS'][cat])
             for misc in config['MISC_PLOTS']['misc_plots_names']:
-                plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_similarities_stats_pt, comps_similarities_stats_ft, self_similarities_stats_pt, self_similarities_stats_ft, config['MISC_PLOTS'][misc], misc, bias_metric, pca_comps)
+                plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_similarities_stats_pt, comps_similarities_stats_ft, self_similarities_stats_pt, self_similarities_stats_ft, config['MISC_PLOTS'][misc], misc)
 
 
 

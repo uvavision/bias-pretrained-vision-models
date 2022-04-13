@@ -65,7 +65,7 @@ import pandas as pd
 fontP = FontProperties()
 fontP.set_size('small')
 
-def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_stats, comps_stats_ft, self_similarities_stats, self_similarities_stats_ft, category_features, plot_type, bias_metric, pca_comps):
+def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_stats, comps_stats_ft, self_similarities_stats, self_similarities_stats_ft, category_features, plot_type):
     """Plots bias analysis experiment results for different subset of classes
     'Indiv': single classes --> man, woman, surfboard, car, refrigerator, etc. (intra-class)
     'Pairs': multi-label --> man+surfboard, woman+car, etc. (intra-class)
@@ -101,14 +101,8 @@ def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft,
                                  for features extracted from finetuned model
         category_features: Classes to be plotted
         plot_type: Indiv, Pairs, Comps --> subset of classes in analysis set
-        bias_metric: Defines which metric to use for similarity/distance: cosine, euclidean, correlation
-        pca_comps: Whether to perform averaging on features that have been transformed with PCA
         
     """
-    if pca_comps == 'None':
-        pca_path = 'no_pca/'
-    else:
-        pca_path = 'pca/'
     y_dict = dict()
     y_dict_ft = dict()
     for i in category_features:
@@ -131,7 +125,7 @@ def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft,
     y_ft = np.asarray(list(y_dict_comp.values()))
     spearman_coeff = stats.spearmanr(y, y_ft)
     spearman_save = {model_name:spearman_coeff}
-    np.save(save_path+'/metric_data/'+ dataset_name + '/'+pca_path+bias_metric+'/spearman_'+plot_type+'.npy', spearman_save)
+    np.save(save_path+'/metric_data/'+ dataset_name + '/'+'spearman_'+plot_type+'.npy', spearman_save)
 
 
     y_err = []
@@ -170,47 +164,31 @@ def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft,
 
 
     if plot_type == 'pairs':
-        if str(pca_comps) != 'None':
-            title = "Model: "+ model_name + " Finetuned on: " +dataset_name+", Paired Classes, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))+ ", PCA: " + str(pca_comps)
-            title_diff = "Model: "+model_name + " Finetuned on: " + dataset_name+ ", Paired Classes (Finetuned - Pretrained), PCA: " + str(pca_comps)
-        else:
-            title = "Model: "+ model_name + " Finetuned on: " + dataset_name + ", Paired Classes, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
-            title_diff = "Model: "+model_name + " Finetuned on: " + dataset_name + ", Paired Classes (Finetuned - Pretrained)"
-        save = save_path + '/boxplots/'+ dataset_name + '/'+pca_path+bias_metric+'/pairs_'+bias_metric+ '.pdf'
-        save_diff = save_path + '/boxplots/' + dataset_name + '/'+ pca_path + bias_metric+'/pairs_diff_' + bias_metric+ '.pdf'
+        title = "Model: "+ model_name + " Finetuned on: " + dataset_name + ", Paired Classes, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
+        title_diff = "Model: "+model_name + " Finetuned on: " + dataset_name + ", Paired Classes (Finetuned - Pretrained)"
+        save = save_path + '/boxplots/'+ dataset_name + '/'+'pairs.pdf'
+        save_diff = save_path + '/boxplots/' + dataset_name + '/' +'pairs_diff.pdf'
         bbox = (0.5, -0.6)
         bottom = 0.5
     elif plot_type == 'comps':
-        if str(pca_comps) != 'None':
-            title = "Model: "+ model_name + " Finetuned on: " + dataset_name + ", Comparison Classes, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))+ ", PCA: " + str(pca_comps)
-            title_diff = "Model: "+model_name + " Finetuned, Comparison Classes (Finetuned - Pretrained), PCA: " + str(pca_comps)
-        else:
-            title = "Model: "+ model_name + " Finetuned on: " + dataset_name +", Comparison Classes, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
-            title_diff = "Model: "+model_name + " Finetuned on: " + dataset_name +", Comparison Classes (Finetuned - Pretrained)"
-        save = save_path + '/boxplots/'+ dataset_name + '/'+pca_path +bias_metric+ '/comps_' + bias_metric+ '.pdf'
-        save_diff = save_path + '/boxplots/'+ dataset_name + '/'+pca_path+bias_metric+'/comps_diff_' + bias_metric+'.pdf'
+        title = "Model: "+ model_name + " Finetuned on: " + dataset_name +", Comparison Classes, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
+        title_diff = "Model: "+model_name + " Finetuned on: " + dataset_name +", Comparison Classes (Finetuned - Pretrained)"
+        save = save_path + '/boxplots/'+ dataset_name + '/' + 'comps.pdf'
+        save_diff = save_path + '/boxplots/'+ dataset_name + '/'+'comps_diff.pdf'
         bbox = (0.5, -0.7)
         bottom = 0.5
     elif plot_type == 'indiv':
-        if str(pca_comps) != 'None':
-            title = "Model: "+ model_name + " Finetuned on: " + dataset_name +", Individual Classes, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))+ ", PCA: " + str(pca_comps)
-            title_diff = "Model: "+model_name +" Finetuned on: " + dataset_name + ", Individual Classes (Finetuned - Pretrained), PCA: " + str(pca_comps)
-        else:
-            title = "Model: "+ model_name + " Finetuned on: " + dataset_name +", Individual Classes, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
-            title_diff = "Model: "+model_name +" Finetuned on: " + dataset_name + ", Individual Classes (Finetuned - Pretrained)"
-        save = save_path + '/boxplots/'+ dataset_name + '/' +pca_path+bias_metric+'/indv_' + bias_metric +'.pdf'
-        save_diff = save_path + '/boxplots/'+ dataset_name + '/' + pca_path + bias_metric+ '/indv_diff_' + bias_metric+'.pdf'  
+        title = "Model: "+ model_name + " Finetuned on: " + dataset_name +", Individual Classes, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
+        title_diff = "Model: "+model_name +" Finetuned on: " + dataset_name + ", Individual Classes (Finetuned - Pretrained)"
+        save = save_path + '/boxplots/'+ dataset_name + '/' +'indv.pdf'
+        save_diff = save_path + '/boxplots/'+ dataset_name + '/' + 'indv_diff.pdf'  
         bbox = (0.5, -0.6)
         bottom = 0.5
     else:
-        if str(pca_comps) != 'None':
-            title = "Model: "+ model_name + " Finetuned on: " + dataset_name +", Class vs. Gender, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))+ ", PCA: " + str(pca_comps)
-            title_diff = "Model: "+model_name +" Finetuned on: " + dataset_name + ", Class vs. Gender Classes (Finetuned - Pretrained), PCA: " + str(pca_comps)
-        else:
-            title = "Model: "+ model_name + " Finetuned on: " + dataset_name +", Class vs. Gender, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
-            title_diff = "Model: "+model_name + " Finetuned on: " + dataset_name +", Class vs. Gender (Finetuned - Pretrained)"
-        save = save_path + '/boxplots/'+ dataset_name + '/' + pca_path +bias_metric + '/object_comp_'+ bias_metric+'.pdf'
-        save_diff = save_path + '/boxplots/' + dataset_name + '/'+pca_path + bias_metric + '/object_comp_diffs_' + bias_metric +'.pdf'
+        title = "Model: "+ model_name + " Finetuned on: " + dataset_name +", Class vs. Gender, \n Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
+        title_diff = "Model: "+model_name + " Finetuned on: " + dataset_name +", Class vs. Gender (Finetuned - Pretrained)"
+        save = save_path + '/boxplots/'+ dataset_name + '/' + 'object_comp.pdf'
+        save_diff = save_path + '/boxplots/' + dataset_name + '/' + 'object_comp_diffs.pdf'
         bbox = (0.5, -0.8)
         bottom = 0.5
 
@@ -230,7 +208,7 @@ def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft,
 
     plt.title(title)
     plt.xlabel("Classes")
-    plt.ylabel(bias_metric+" score")
+    plt.ylabel("cosine score")
     plt.savefig(save, format='pdf')
 
     fig2 = plt.figure()
@@ -243,6 +221,6 @@ def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft,
 
     plt.title(title_diff)
     plt.xlabel("Classes")
-    plt.ylabel(bias_metric+" score")
+    plt.ylabel("cosine score")
     plt.savefig(save_diff, format='pdf')
 

@@ -332,11 +332,11 @@ class ClipViTFeatureExtractor():
                 for subcategory in analysis_data_loaded[category]:
                     print("Building pretrained features for: ", analysis_data_names[category][subcategory])
                     features = self.build_features_pt(analysis_data_loaded[category][subcategory])
-                    np.save(save_path+'features/'+self.dataset+"/pretrained_features/no_pca/" + analysis_data_names[category][subcategory] + "_pt.npy", features.cpu().numpy())
+                    np.save(save_path+'features/'+self.dataset+"/pretrained_features/" + analysis_data_names[category][subcategory] + "_pt.npy", features.cpu().numpy())
                     pretrained_features[analysis_data_names[category][subcategory] + "_pt"] = features
-            if args.pca != 0.0:
-                print("Computing PCA Analysis with n_components = " + str(args.pca))
-                pretrained_features = self.pca_analysis(pretrained_features, args.pca, save_path+self.dataset+"/pretrained_features/pca/")
+            #if args.pca != 0.0:
+                #print("Computing PCA Analysis with n_components = " + str(args.pca))
+                #pretrained_features = self.pca_analysis(pretrained_features, args.pca, save_path+self.dataset+"/pretrained_features/pca/")
             return pretrained_features
         else:
             print("Building finetuned and pretrained features for ViT/Resnet50" + " on analysis set: " + args.analysis_set)
@@ -347,17 +347,17 @@ class ClipViTFeatureExtractor():
                 for subcategory in analysis_data_loaded[category]:
                     print("Building finetuned features for: ", analysis_data_names[category][subcategory])
                     features_ft = self.build_features_ft(model_ft, analysis_data_loaded[category][subcategory])
-                    np.save(save_path+'features/' +self.dataset+"/finetuned_features/no_pca/" + analysis_data_names[category][subcategory] + "_ft.npy", features_ft.cpu().numpy())
+                    np.save(save_path+'features/' +self.dataset+"/finetuned_features/" + analysis_data_names[category][subcategory] + "_ft.npy", features_ft.cpu().numpy())
                     all_features[analysis_data_names[category][subcategory] + "_ft"] = features_ft
                     all_features_ft[analysis_data_names[category][subcategory] + "_ft"] = features_ft
                     print("Building pretrained features for: ", analysis_data_names[category][subcategory])
                     features_pt = self.build_features_pt(analysis_data_loaded[category][subcategory])
-                    np.save(save_path+'features/'+self.dataset+"/pretrained_features/no_pca/" + analysis_data_names[category][subcategory] + "_pt.npy", features_pt.cpu().numpy())
+                    np.save(save_path+'features/'+self.dataset+"/pretrained_features/" + analysis_data_names[category][subcategory] + "_pt.npy", features_pt.cpu().numpy())
                     all_features[analysis_data_names[category][subcategory] + "_pt"] = features_pt
                     all_features_pt[analysis_data_names[category][subcategory] + "_pt"] = features_pt
-            if args.pca != 0.0:
-                print("Computing PCA Analysis with n_components = " + str(args.pca))
-                all_features_ft = self.pca_analysis(all_features_ft, args.pca, save_path+self.dataset+"/finetuned_features/pca/")
-                all_features_pt = self.pca_analysis(all_features_pt, args.pca, save_path+self.dataset+"/pretrained_features/pca/")
-                all_features = all_features_ft.update(all_features_pt)
+            #if args.pca != 0.0:
+                #print("Computing PCA Analysis with n_components = " + str(args.pca))
+                #all_features_ft = self.pca_analysis(all_features_ft, args.pca, save_path+self.dataset+"/finetuned_features/pca/")
+                #all_features_pt = self.pca_analysis(all_features_pt, args.pca, save_path+self.dataset+"/pretrained_features/pca/")
+                #all_features = all_features_ft.update(all_features_pt)
             return all_features
