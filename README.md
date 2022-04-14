@@ -30,8 +30,18 @@ We currently support finetuning on the following datasets: COCO 2017 and Open Im
 2. #### Open Images: Download and setup images and annotations [here](https://storage.googleapis.com/openimages/web/download.html)
 
 ### Setup Models
-1. To use SimCLR ResNet50, download ResNet50 (1x) from [here](https://github.com/google-research/simclr) and place the foler in the `models_def/` directory
-2. To use MoCo ResNet50, download MoCo v1 from [here](https://github.com/facebookresearch/moco) and place the .tar file in `models_def/` directory
+1. To use SimCLR ResNet50: Firstly, download and unzip the checkpoints from [SimCLR](https://github.com/google-research/simclr) repo, you will get 3 folders: `ResNet50_1x`, `ResNet50_2x`, and `ResNet50_4x`.
+2. From [simclr-converter](https://github.com/tonylins/simclr-converter) Run the following commands to convert the 3 checkpoints:
+
+   ```bash
+   python convert.py ResNet50_1x/model.ckpt-225206 resnet50-1x.pth
+   python convert.py ResNet50_2x/model.ckpt-225206 resnet50-2x.pth
+   python convert.py ResNet50_4x/model.ckpt-225206 resnet50-4x.pth
+   ```
+
+   You will get 3 PyTorch checkpoints, `resnet50-1x.pth`, `resnet50-2x.pth`, `resnet50-4x.pth`. The model definition is in `resent_wider.py`. Ensure `resnet50-1x.pth` is located in `models_def/ResNet50_1x/resnet50-1x.pth`. 
+
+3. To use MoCo ResNet50, download MoCo v1 from [here](https://github.com/facebookresearch/moco) and place the .tar file in `models_def/` directory
 
 ## Usage
 Currently, this repo supports the following six features:
@@ -273,7 +283,7 @@ The following test script is provided to test the six features. Replace the vari
 ```bash
 python ./test.sh
 ```
-## Customization
+## Customization (Note - these features are experimental)
 
 ### Adding a Model
 The following models have already been implemented: 
