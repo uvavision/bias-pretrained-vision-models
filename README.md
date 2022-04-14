@@ -356,6 +356,10 @@ python custom.py --root experiments --model_list model_one, model_two --training
 - `model_init.py`: Initializes model for finetuning by reshaping the last layer and configures the optimizers, loss function and other hyperparameters
 - `train.py` : contains generalized training details and cmd line functions
 - `experiments/`: contains metadata for all trained models in the paper
+- `setup.py`: sets up datasets and directories
+- `test.sh`: contains commands to test all six features of this repo
+- `utils.py`: reads analysis sets and loads features
+- `custom.py`: creates directories for adding a new model, new analysis set, or training set
 
 
 ## Notes
