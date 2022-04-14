@@ -204,14 +204,10 @@ def main():
             help='model type: clip, resnet18, resnet34, resnet50, resnet101, resnet152, resnext50_32x4d, resnext101_32x8d, wide_resnet50_2, wide_resnet101_2, alexnet, vgg, densenet, googlenet', default='resnet18')
     parser.add_argument('--dataset', type=str,
             help='Options: coco and openimages', default='coco')
-    # parser.add_argument('--coco_path', type=str,
-    #         help='folder path to coco dataset', default="/localtmp/data/coco2017/coco_dataset/")
     parser.add_argument('--dataset_path', type=str,
             help='folder path to training dataset', default="/localtmp/data/coco2017/coco_dataset/")
     parser.add_argument('--analysis_set_path', type=str,
             help='folder path to analysis dataset', default="/localtmp/data/coco2017/coco_dataset/")
-    # parser.add_argument('--openimages_path', type=str,
-    #         help='folder path to openimages', default="/data/openimages/")
     parser.add_argument('--bias_analysis',
             help='If True, performs cosine self similarity experiments', action='store_true')
     parser.add_argument('--load_features',
@@ -222,20 +218,12 @@ def main():
             help='Resume training from a saved checkpoint', action='store_true')
     parser.add_argument('--config_file', type=str,
             help='path to config file', default="config/coco_ini")
-    #parser.add_argument('--pca', type=float, 
-            #help='Number of components for pca on features before bias analysis', default=0.0)
-    #parser.add_argument('--bias_metric', type=str,
-            #help='cosine or euclidean for bias analysis', default="cosine")
-    #parser.add_argument('--trend_analysis',
-            #help='analyze trends across finetuned, pretrained, or differences: ft, pt, diff', action='store_true') 
     parser.add_argument('--finetune',
             help='finetune or train model from scratch', action='store_true')
     parser.add_argument('--multiple_trials',
             help='plot bias analysis across multiple trials', action='store_true')
     parser.add_argument('--extract_cross_analysis_features',
             help='extract features for an analysis set different than data the model is trained on', action='store_true')
-    # parser.add_argument('--cross_analysis',
-    #         help='Bias analysis for model trained on a different dataset than the analysis set', action='store_true')
     parser.add_argument('--trial_path', type=str,
             help='path to training run', default='experiments/coco/bit_resnet50/2022-01-15 14:18:21')
     parser.add_argument('--checkpoint', type=str,

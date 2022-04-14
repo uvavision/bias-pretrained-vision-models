@@ -331,7 +331,7 @@ python custom.py --root experiments --model_list model1 model2 --analysis_set ie
 
 ### Training on an additional dataset
 
-Setup up the directory as follows: 
+1. Setup up the directory as follows: 
 
 ```bash
 python custom.py \
@@ -340,11 +340,12 @@ python custom.py \
     --training_set_name <list of training datasets to test>
     --add_training_set
 ```
-For example, if I have two training datasets: ['coco', 'openimages'] and two models ['model_one', 'model_two', and want to add an additional training dataset: imagenet to each of the models for each of the training datasets
+For example, if I have two training datasets: ['coco', 'openimages'] and two models ['model_one', 'model_two', and want to add an additional training dataset: imagenet to each of the models for each of the existing training datasets
 ```bash
 python custom.py --root experiments --model_list model_one, model_two --training_set_name imagenet --add_training_set
 ```
- 
+2. In `dataloader.py`, add an additional class for your dataset following the examples for COCO and Openimages
+3. In `setup.py`, in `setup_dataset()`, add an additional block to setup the preprocessing and dataloaders for your new dataset
 
 ## Contents
 - `analysis_sets/`: coco and openimages analysis sets where each subfolder contains text files for each class in an analysis sets that details image ids or urls for that dataset
