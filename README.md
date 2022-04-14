@@ -106,7 +106,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
 ```bash
 CUDA_VISIBLE_DEVICES=\# python train.py \
     --model_name <name of finetuned model: e.g. 'bit_resnet50'> \
-    --dataset <name of dataset to be finetunend on: e.g. 'coco'> \
+    --dataset <name of dataset to be finetuned on: e.g. 'coco'> \
     --dataset_path <path to dataset the model will be finetuned on> \
     --num_classes <number of classes /in dataset the model will be finetuned on: e.g. 80> \
     --batch_size <\#> \
@@ -126,7 +126,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
 ```bash
 CUDA_VISIBLE_DEVICES=\# python train.py \
     --model_name <name of finetuned model: e.g. 'bit_resnet50'> \
-    --dataset <name of dataset to be finetunend on: e.g. 'coco'> \
+    --dataset <name of dataset to be finetuned on: e.g. 'coco'> \
     --dataset_path <path to dataset the model will be finetuned on> \
     --num_classes <number of classes /in dataset the model will be finetuned on: e.g. 80> \
     --batch_size <\#> \
