@@ -274,7 +274,7 @@ def plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_
 
     fig.add_trace(trace)
 
-    title = "Averaged, Model: "+model_name + " Finetuend on: " + dataset_name+", Class: "+ category_name + "<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
+    title = "Averaged, Model: "+model_name + " Finetuned on: " + dataset_name+", Class: "+ category_name + "<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
 
     fig.update_layout(
         title={
@@ -305,7 +305,7 @@ def plot_indiv_cats_comps_mult_trials(model_name, dataset_name, save_path, mins_
     colors = ['r', 'g', 'b', 'c', 'm', 'lime', 'orange', 'steelblue', 'silver', 'turquoise', 'violet', 'gold', 'lawngreen', 'pink', 'deepskyblue', 'palegreen', 'peachpuff', 'dodgerblue', 'peru', 'tomato']
     fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgray')
 
-    save = save_path + '/boxplots/'+ dataset_name +category_name+ '_comp_averaged.pdf'
+    save = save_path + '/boxplots/'+ dataset_name +'/'+ category_name+ '_comp_averaged.pdf'
     fig.write_image(save)
     fig2 = plt.figure()
     for i in range(len(y_dict)):
