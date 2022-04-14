@@ -144,6 +144,14 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
     --checkpoint <path to checkpoint: e.g. 'experiments/coco/resnet50/2022-01-19\ 16\:43\:15/model/resnet50/version_0/checkpoints/epoch\=24-step\=46224.ckpt'> \
     --seed <\#>
 ```
+
+## Test script
+
+The following test script is provided to test the six features. Replace the variables with your custom environment variables to test each feature
+```bash
+python ./test.sh
+```
+
 ## Replicating Results
 1. To recreate Table 2, refer to the jupyter notebook: `experimental_work/ieat.ipynb`
 2. To recreate Table 3, Figure 3, Table 4 and Figure 4 and all the subsequent plots in the Supplementary material, it is assumed that the `experiments/training_dataset/model_name/` folder contains multiple trial runs for a model, and the results are averaged across these runs. By changing the `--model_name, --num_classes, --analysis_set, --analysis_set_path --config_file` flags, you can generate different sets of results and plots using the saved features and finetuned models 
@@ -279,12 +287,6 @@ experiments
 │   └── model_n
 ```
 
-## Test script
-
-The following test script is provided to test the six features. Replace the variables with your custom environment variables to test each feature
-```bash
-python ./test.sh
-```
 ## Customization (Note - these features are experimental)
 
 ### Adding a Model
