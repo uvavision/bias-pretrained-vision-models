@@ -41,6 +41,8 @@ We currently support finetuning on the following datasets: COCO 2017 and Open Im
 
    You will get 3 PyTorch checkpoints, `resnet50-1x.pth`, `resnet50-2x.pth`, `resnet50-4x.pth`. The model definition is in `resent_wider.py`. Ensure `resnet50-1x.pth` is located in `models_def/ResNet50_1x/resnet50-1x.pth`. 
 
+Not yet tested on [simclrv2](https://github.com/Separius/SimCLRv2-Pytorch)
+
 3. To use MoCo ResNet50, download MoCo v1 from [here](https://github.com/facebookresearch/moco) and place the .tar file in `models_def/` directory
 
 ## Usage
