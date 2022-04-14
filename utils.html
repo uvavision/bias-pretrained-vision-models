@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module utils</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>utils</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/u/lab/jr4fs/bias-pretrained-vision-models/utils.py">/u/lab/jr4fs/bias-pretrained-vision-models/utils.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="IPython.html">IPython</a><br>
+<a href="PIL.Image.html">PIL.Image</a><br>
+<a href="clip.html">clip</a><br>
+<a href="copy.html">copy</a><br>
+<a href="torchvision.datasets.html">torchvision.datasets</a><br>
+<a href="torchvision.datasets.html">torchvision.datasets</a><br>
+<a href="json.html">json</a><br>
+</td><td width="25%" valign=top><a href="sklearn.metrics.html">sklearn.metrics</a><br>
+<a href="torchvision.models.html">torchvision.models</a><br>
+<a href="torch.nn.html">torch.nn</a><br>
+<a href="numpy.html">numpy</a><br>
+<a href="torch.optim.html">torch.optim</a><br>
+<a href="os.html">os</a><br>
+<a href="pickle.html">pickle</a><br>
+</td><td width="25%" valign=top><a href="random.html">random</a><br>
+<a href="skimage.html">skimage</a><br>
+<a href="subprocess.html">subprocess</a><br>
+<a href="sys.html">sys</a><br>
+<a href="time.html">time</a><br>
+<a href="torch.html">torch</a><br>
+<a href="torchvision.html">torchvision</a><br>
+</td><td width="25%" valign=top><a href="tqdm.html">tqdm</a><br>
+<a href="torchvision.transforms.html">torchvision.transforms</a><br>
+<a href="urllib.html">urllib</a><br>
+<a href="yaml.html">yaml</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-analysis_data"><strong>analysis_data</strong></a>(config:str)</dt><dd><tt>Reads&nbsp;a&nbsp;config&nbsp;file&nbsp;and&nbsp;returns&nbsp;the&nbsp;analysis&nbsp;dataset<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;config:&nbsp;A&nbsp;path&nbsp;to&nbsp;the&nbsp;config&nbsp;file&nbsp;for&nbsp;the&nbsp;analysis&nbsp;set<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;all_analysis_data:&nbsp;A&nbsp;dictionary&nbsp;mapping&nbsp;class&nbsp;names&nbsp;to&nbsp;a&nbsp;list&nbsp;of&nbsp;images&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;corresponding&nbsp;to&nbsp;that&nbsp;class.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;analysis_data_names:&nbsp;A&nbsp;dictionary&nbsp;mapping&nbsp;class&nbsp;names&nbsp;to&nbsp;their&nbsp;abbreviations<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;plotting.</tt></dd></dl>
+ <dl><dt><a name="-load_features"><strong>load_features</strong></a>(folder:str, analysis_set:str, only_pretrained:bool=False)</dt><dd><tt>Loads&nbsp;generated&nbsp;features&nbsp;for&nbsp;an&nbsp;analysis&nbsp;set&nbsp;from&nbsp;a&nbsp;trained&nbsp;model&nbsp;<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;folder:&nbsp;Path&nbsp;to&nbsp;model&nbsp;trial&nbsp;from&nbsp;which&nbsp;to&nbsp;load&nbsp;features<br>
+&nbsp;&nbsp;&nbsp;&nbsp;analysis_set:&nbsp;Specifies&nbsp;which&nbsp;analysis&nbsp;set&nbsp;the&nbsp;features&nbsp;were&nbsp;computed&nbsp;on<br>
+&nbsp;&nbsp;&nbsp;&nbsp;only_pretraied:&nbsp;When&nbsp;False,&nbsp;returns&nbsp;features&nbsp;generated&nbsp;from&nbsp;the&nbsp;pretrained&nbsp;and&nbsp;finetuned&nbsp;model<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;features:&nbsp;A&nbsp;dictionary&nbsp;mapping&nbsp;class&nbsp;name&nbsp;(specified&nbsp;in&nbsp;config&nbsp;file&nbsp;of&nbsp;analysis_set)&nbsp;to&nbsp;a&nbsp;tensor&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;features&nbsp;of&nbsp;size&nbsp;N&nbsp;x&nbsp;d&nbsp;where&nbsp;N&nbsp;is&nbsp;the&nbsp;number&nbsp;of&nbsp;examples&nbsp;in&nbsp;a&nbsp;class&nbsp;and&nbsp;is&nbsp;the&nbsp;dimension<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size&nbsp;of&nbsp;the&nbsp;model</tt></dd></dl>
+ <dl><dt><a name="-read_file"><strong>read_file</strong></a>(file_name:str)</dt><dd><tt>Opens&nbsp;a&nbsp;file&nbsp;and&nbsp;returns&nbsp;a&nbsp;list&nbsp;of&nbsp;the&nbsp;contents<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;file_name:&nbsp;A&nbsp;path&nbsp;to&nbsp;the&nbsp;file&nbsp;that&nbsp;reads&nbsp;to&nbsp;be&nbsp;read<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;urls:&nbsp;A&nbsp;list&nbsp;of&nbsp;strings&nbsp;in&nbsp;the&nbsp;file:&nbsp;fileName</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>division</strong> = _Feature((2, 2, 0, 'alpha', 2), (3, 0, 0, 'alpha', 0), 8192)<br>
+<strong>print_function</strong> = _Feature((2, 6, 0, 'alpha', 2), (3, 0, 0, 'alpha', 0), 65536)</td></tr></table>
+</body></html>
