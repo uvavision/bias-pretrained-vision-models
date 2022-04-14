@@ -60,52 +60,19 @@ def setup_dirs(base_path: str, from_scratch: bool = False):
     os.mkdir(base_path+'/'+'metric_data/'+'coco', mode=0o777)
     os.mkdir(base_path+'/'+'metric_data/'+'openimages', mode=0o777)
 
-    # os.mkdir(base_path+'/'+'metric_data/coco/'+'no_pca', mode=0o777)
-    # os.mkdir(base_path+'/'+'metric_data/coco/'+'no_pca/'+'correlation', mode=0o777)
-    # os.mkdir(base_path+'/'+'metric_data/coco/'+'no_pca/'+'cosine', mode=0o777)
-    # os.mkdir(base_path+'/'+'metric_data/coco/'+'no_pca/'+'euclidean', mode=0o777)
-
-    # os.mkdir(base_path+'/'+'metric_data/openimages/'+'no_pca', mode=0o777)
-    # os.mkdir(base_path+'/'+'metric_data/openimages/'+'no_pca/'+'correlation', mode=0o777)
-    # os.mkdir(base_path+'/'+'metric_data/openimages/'+'no_pca/'+'cosine', mode=0o777)
-    # os.mkdir(base_path+'/'+'metric_data/openimages/'+'no_pca/'+'euclidean', mode=0o777)
-
     os.mkdir(base_path+'/'+'boxplots', mode=0o777)
     os.mkdir(base_path+'/'+'boxplots/'+'coco', mode=0o777)
     os.mkdir(base_path+'/'+'boxplots/'+'openimages', mode=0o777)
-
-    # os.mkdir(base_path+'/'+'boxplots/coco/'+'no_pca', mode=0o777)
-    # os.mkdir(base_path+'/'+'boxplots/coco/'+'no_pca/'+'correlation', mode=0o777)
-    # os.mkdir(base_path+'/'+'boxplots/coco/'+'no_pca/'+'cosine', mode=0o777)
-    # os.mkdir(base_path+'/'+'boxplots/coco/'+'no_pca/'+'euclidean', mode=0o777)        
-    
-
-    # os.mkdir(base_path+'/'+'boxplots/openimages/'+'no_pca', mode=0o777)
-    # os.mkdir(base_path+'/'+'boxplots/openimages/'+'no_pca/'+'correlation', mode=0o777)
-    # os.mkdir(base_path+'/'+'boxplots/openimages/'+'no_pca/'+'cosine', mode=0o777)
-    # os.mkdir(base_path+'/'+'boxplots/openimages/'+'no_pca/'+'euclidean', mode=0o777) 
-
-
 
     os.mkdir(base_path+'/'+'features', mode=0o777)
     os.mkdir(base_path+'/'+'features/' + 'coco', mode=0o777)
     os.mkdir(base_path+'/'+'features/' + 'openimages', mode=0o777)
 
     os.mkdir(base_path+'/'+'features/'+'coco/'+'finetuned_features', mode=0o777)
-    # os.mkdir(base_path+'/'+'features/'+'coco/'+'finetuned_features/'+'no_pca', mode=0o777)
-    # os.mkdir(base_path+'/'+'features/'+'coco/'+'finetuned_features/'+'pca', mode=0o777)
-
     os.mkdir(base_path+'/'+'features/'+'coco/'+'pretrained_features', mode=0o777)
-    # os.mkdir(base_path+'/'+'features/'+'coco/'+'pretrained_features/'+'no_pca', mode=0o777)
-    # os.mkdir(base_path+'/'+'features/'+'coco/'+'pretrained_features/'+'pca', mode=0o777)
 
     os.mkdir(base_path+'/'+'features/'+'openimages/'+'finetuned_features', mode=0o777)
-    # os.mkdir(base_path+'/'+'features/'+'openimages/'+'finetuned_features/'+'no_pca', mode=0o777)
-    # os.mkdir(base_path+'/'+'features/'+'openimages/'+'finetuned_features/'+'pca', mode=0o777)
-
     os.mkdir(base_path+'/'+'features/'+'openimages/'+'pretrained_features', mode=0o777)
-    # os.mkdir(base_path+'/'+'features/'+'openimages/'+'pretrained_features/'+'no_pca', mode=0o777)
-    # os.mkdir(base_path+'/'+'features/'+'openimages/'+'pretrained_features/'+'pca', mode=0o777)
     
     os.mkdir(base_path+'/'+'model', mode=0o777)
     os.mkdir(base_path+'/'+'model'+'/'+'updates', mode=0o777)
@@ -114,18 +81,8 @@ def setup_dirs(base_path: str, from_scratch: bool = False):
         os.mkdir(base_path + '/'+'model_scratch', mode=0o777)
         os.mkdir(base_path + '/'+'model_scratch/'+'metric_data', mode=0o777)
         os.mkdir(base_path + '/'+'model_scratch/'+'boxplots', mode=0o777)
-        # os.mkdir(base_path + '/'+'model_scratch/'+'boxplots/'+'pca', mode=0o777)
-        # os.mkdir(base_path + '/'+'model_scratch/'+'boxplots/'+'pca/'+'cosine', mode=0o777)
-        # os.mkdir(base_path + '/'+'model_scratch/'+'boxplots/'+'pca/'+'correlation', mode=0o777)
-        # os.mkdir(base_path + '/'+'model_scratch/'+'boxplots/'+'pca/'+'euclidean', mode=0o777)
-        # os.mkdir(base_path + '/'+'model_scratch/'+'boxplots/'+'no_pca', mode=0o777)
-        # os.mkdir(base_path + '/'+'model_scratch/'+'boxplots/'+'no_pca/'+'cosine', mode=0o777)
-        # os.mkdir(base_path + '/'+'model_scratch/'+'boxplots/'+'no_pca/'+'correlation', mode=0o777)
-        # os.mkdir(base_path + '/'+'model_scratch/'+'boxplots/'+'no_pca/'+'euclidean', mode=0o777)   
 
         os.mkdir(base_path + '/'+'model_scratch/'+'pretrained_features', mode=0o777)
-        # os.mkdir(base_path + '/'+'model_scratch/'+'pretrained_features/'+'pca', mode=0o777)
-        # os.mkdir(base_path + '/'+'model_scratch/'+'pretrained_features/'+'no_pca', mode=0o777)
 
         os.mkdir(base_path + '/'+'model_scratch/'+'model', mode=0o777)
         os.mkdir(base_path + '/'+'model_scratch/'+'model/'+'model_updates', mode=0o777)

@@ -9,6 +9,17 @@
 conda env create -f environment.yml
 conda activate bias_vision
 ```
+### Setup experiments/ folder
+```bash
+python custom.py \
+    --model_list <list of models to test> \
+    --training_datasets <list of training datasets to test>
+```
+For example, if I have two training datasets: ['coco', 'openimages'] and two models ['model_one', 'model_two']
+```bash
+python custom.py --initial_setup --model_list model_one, model_two --training_datasets coco openimages
+```
+ 
 
 ### Setup Datasets
 We currently support finetuning on the following datasets: COCO 2017 and Open Images, please refer to section "Training on an additional dataset" for details on how to add an additional dataset for finetuning 
@@ -265,16 +276,54 @@ The following models have already been implemented:
 ```
 1. In `train.py`, modify the `models_implemented` list in `lightning_setup()` and `lightning_train()` and add the name of the model 
 2. In `model_init.py`, modify `load_models_pytorch()` to setup the model to be trained with pytorch lightning for multi-label classification on an available dataset 
-3. Lastly, manually create a directory for your model in the `experiments/` directory, see step 3 in the "Replicating Results" section to ensure training metadata for your model is created. For example, you will only need to create `experiments/analysis_set/model_name/`. We are currently working on a script to automate this. 
-3. *This is discouraged but included here if absolutely necessary* Note, if your model cannot be trained with pytorch lightning, you will need to define a separate function in `model_init.py` following the example for clip: `initialize_model_clip()`. Additionally, you will need to add a file such as `clip_model.py` in `models_def/` defining the training functions and feature extraction logic for such a model. This will also involve modifying `lightning_train(), lightning_setup(), main()` and `extract_features()` in `train.py` to include separate calls for this model. 
+3. Lastly, set up the directory as follows: (assumes the `experiments/` folder exists - see section above)
+```bash
+python custom.py \
+    --root <path to experiments folder> \
+    --model_name <name of model to add> \
+    --add_model
+```
+For example, if I want to add a model named: resnet to all the training datasets in the `experiments/` folder:
+```bash
+python custom.py --root experiments --model_name resnet --add_model
+```
+4. *This is discouraged but included here if absolutely necessary* Note, if your model cannot be trained with pytorch lightning, you will need to define a separate function in `model_init.py` following the example for clip: `initialize_model_clip()`. Additionally, you will need to add a file such as `clip_model.py` in `models_def/` defining the training functions and feature extraction logic for such a model. This will also involve modifying `lightning_train(), lightning_setup(), main()` and `extract_features()` in `train.py` to include separate calls for this model. 
 
 ### Adding an Analysis Set
 1. In `analysis_sets/`, create an additional directory with the name of your analysis set that specifies .txt files for each class in the set. The .txt file should contain image_ids or urls to the images in that class
 2. In `config/`, create a .yaml file specifying the metadata for that analysis set. Follow `coco.yaml` for an example. Label names and classes names categories define abbreviations to be used during plotting
 3. `pytorch_models.py` includes a `PytorchFeatureExtractor` class (`clip_model.py` includes one as well) which includes a `process_imgs()` function that specifies how to access the images in the .txt files in `analysis_sets/`. Add in an additional line for your analysis set and modify the class attributes accordingly if needed. 
-4. Currently, you need to manually create a directory in each model's trials to include results for the analysis set, we are currently working on a script to automate this
+4. Set up the directory as follows: (assumes the `experiments/` folder exists - see section above)
+root, analysis_set, model_list
+
+```bash
+python custom.py \
+    --root <path to experiments folder> \
+    --model_list <list of models to test> \
+    --analysis_set <name of analysis_set to add> \
+    --add_analysis_set
+```
+For example, if I want to add an analysis set named: ieat to all the training datasets in the `experiments/` folder for each model in model_list:
+```bash
+python custom.py --root experiments --model_list model1 model2 --analysis_set ieat --add_analysis_set
+```
 
 ### Training on an additional dataset
+
+Setup up the directory as follows: 
+
+```bash
+python custom.py \
+    --root <path to experiments folder> \
+    --model_list <list of models to test> \
+    --training_set_name <list of training datasets to test>
+    --add_training_set
+```
+For example, if I have two training datasets: ['coco', 'openimages'] and two models ['model_one', 'model_two', and want to add an additional training dataset: imagenet to each of the models for each of the training datasets
+```bash
+python custom.py --root experiments --model_list model_one, model_two --training_set_name imagenet --add_training_set
+```
+ 
 
 ## Contents
 - `analysis_sets/`: coco and openimages analysis sets where each subfolder contains text files for each class in an analysis sets that details image ids or urls for that dataset
