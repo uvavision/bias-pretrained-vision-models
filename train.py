@@ -248,18 +248,6 @@ def main():
             help='random seed', default=1)
     args = parser.parse_args()
     torch.backends.cudnn.benchmark = True
-    
-    if not args.load_features and not args.extract_cross_analysis_features:
-        # Setup trial directory for a model ... assumes this path already exists: 'experiments/dataset_name/model_name/
-        datestring = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        if args.finetune:
-            os.mkdir('experiments/'+ args.dataset + '/' + args.model_name+'/'+datestring)
-            model_path = 'experiments/'+ args.dataset + '/' + args.model_name+'/'+datestring
-            setup_dirs(model_path)
-        else:
-            os.mkdir('experiments/'+ args.dataset + '/' +args.model_name+'/model_scratch'+'/'+datestring)
-            model_path = 'experiments/'+ args.dataset + '/' +args.model_name+'/model_scratch'+'/'+datestring
-            setup_dirs(model_path, from_scratch=True)
 
     if args.bias_analysis == True and args.load_features == True and not args.pretrained_features and not args.extract_cross_analysis_features:
         # Don't finetune and just use saved features for full bias analysis with finetuned and pretrained features
@@ -284,6 +272,16 @@ def main():
             run_experiment(args.model_name, args.trial_path, args.dataset, args.analysis_set, args.config_file, features=features, only_pretrained=True, multiple_trials=args.multiple_trials)
     else:
         # Finetune, train the model from scratch or resume training, extract both pretrained and finetuned features and run bias analysis on them
+        datestring = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if args.finetune:
+            os.mkdir('experiments/'+ args.dataset + '/' + args.model_name+'/'+datestring)
+            model_path = 'experiments/'+ args.dataset + '/' + args.model_name+'/'+datestring
+            setup_dirs(model_path)
+        else:
+            os.mkdir('experiments/'+ args.dataset + '/' +args.model_name+'/model_scratch'+'/'+datestring)
+            model_path = 'experiments/'+ args.dataset + '/' +args.model_name+'/model_scratch'+'/'+datestring
+            setup_dirs(model_path, from_scratch=True)
+
         dataloaders_dict = setup_dataset(args)
         model_ft = lightning_train(args, dataloaders_dict, model_path, resume_training=args.resume_training)
         features = extract_features(args, model_path, only_pretrained=False, model_ft=model_ft)
