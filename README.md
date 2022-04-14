@@ -14,10 +14,11 @@ conda activate bias_vision
 python custom.py \
     --model_list <list of models to test> \
     --training_datasets <list of training datasets to test>
+    --initial_setup
 ```
 For example, if I have two training datasets: ['coco', 'openimages'] and two models ['model_one', 'model_two']
 ```bash
-python custom.py --initial_setup --model_list model_one, model_two --training_datasets coco openimages
+python custom.py --model_list model_one, model_two --training_datasets coco openimages --initial_setup
 ```
  
 
@@ -266,6 +267,12 @@ experiments
 │   └── model_n
 ```
 
+## Test script
+
+The following test script is provided to test the six features. Replace the variables with your custom environment variables to test each feature
+```bash
+python ./test.sh
+```
 ## Customization
 
 ### Adding a Model
