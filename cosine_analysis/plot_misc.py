@@ -7,42 +7,21 @@ import matplotlib.lines as mlines
 from data_loader import V
 
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 import subprocess
 import numpy as np
 import json, os, sys, random, pickle
 import torchvision.datasets as dset
-from torchvision import transforms 
 import os
-import skimage
-#import IPython.display
-#import matplotlib.pyplot as plt
 from PIL import Image
 import urllib
 from collections import OrderedDict
 import torchvision.datasets as dset
-from torchvision import transforms 
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-import skimage
-import IPython.display
 import urllib
 from collections import OrderedDict
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-from torchvision import datasets, models, transforms
 import time
 import copy
-import tqdm
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import f1_score
-from sklearn import metrics
-from sklearn.metrics import accuracy_score
-import clip
-#from skimage import io
-from pycocotools.coco import COCO
-from sklearn.preprocessing import StandardScaler
 from scipy import stats
 import torch
 print("Torch version:", torch.__version__)
@@ -55,7 +34,6 @@ import matplotlib.pyplot as plt
 plt.figure(num=None, figsize=(10, 8), dpi=1500, facecolor='w', edgecolor='k')
 from matplotlib.font_manager import FontProperties
 import yaml
-import dcor 
 import itertools
 import matplotlib.cm as cm
 import datetime
@@ -70,7 +48,7 @@ def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft,
     'Indiv': single classes --> man, woman, surfboard, car, refrigerator, etc. (intra-class)
     'Pairs': multi-label --> man+surfboard, woman+car, etc. (intra-class)
     'Comps' compares two classes --> man vs. surfboard, woman+car vs woman etc. (inter-class)
-    
+
     Args:
         model_name: Name of model to perform bias metric experiment on
         dataset_name: Analysis set
@@ -101,7 +79,7 @@ def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft,
                                  for features extracted from finetuned model
         category_features: Classes to be plotted
         plot_type: Indiv, Pairs, Comps --> subset of classes in analysis set
-        
+
     """
     y_dict = dict()
     y_dict_ft = dict()
@@ -135,7 +113,7 @@ def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft,
             y_err.append(mins_maxes_pt[key])
         else:
             y_err.append(mins_maxes_comps_pt[key])
-        
+
     for key in y_dict_comp:
         if key in mins_maxes_ft:
             y_err_ft.append(mins_maxes_ft[key])
@@ -194,7 +172,7 @@ def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft,
 
     # plt.legend(labels, bbox_to_anchor=(1.1, 1.1), loc='upper left', prop=fontP)
     #l1 = plt.legend(labels, bbox_to_anchor=bbox, loc='lower center', prop=fontP, ncol=3)
-    
+
     triangle = matplotlib.lines.Line2D([], [], color='g', marker='^', linestyle='None',
                           markersize=10, label='Finetuned')
     circle = matplotlib.lines.Line2D([], [], color='b', marker='o', linestyle='None',
@@ -223,4 +201,3 @@ def plot_misc(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft,
     plt.xlabel("Classes")
     plt.ylabel("cosine score")
     plt.savefig(save_diff, format='pdf')
-

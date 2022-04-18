@@ -4,42 +4,22 @@ import subprocess
 import numpy as np
 import json, os, sys, random, pickle
 import torchvision.datasets as dset
-from torchvision import transforms 
 import os
-import skimage
-#import IPython.display
-#import matplotlib.pyplot as plt
 from PIL import Image
 import urllib
 from collections import OrderedDict
 import torchvision.datasets as dset
-from torchvision import transforms 
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-import skimage
-import IPython.display
 import urllib
 from collections import OrderedDict
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-from torchvision import datasets, models, transforms
 import time
 import copy
-import tqdm
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import f1_score
-from sklearn import metrics
-from sklearn.metrics import accuracy_score
-import clip
-#from skimage import io
-from pycocotools.coco import COCO
-from sklearn.preprocessing import StandardScaler
 import os
 import glob
 from pathlib import Path
 import pandas as pd
-from skimage import io, transform
 import torch
 import time
 import pickle
@@ -65,7 +45,6 @@ from typing import Callable
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
-from torchvision import transforms
 
 print("Torch version:", torch.__version__)
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -98,29 +77,28 @@ class Coco(Dataset):
 
         Args:
             idx: COCO index of image
-        
+
         Returns:
             sample: Tuple of image tensor and binary labels of size (80,)
         """
         image_mean = torch.tensor([0.48145466, 0.4578275, 0.40821073])
         image_std = torch.tensor([0.26862954, 0.26130258, 0.27577711])
-        
+
         if torch.is_tensor(idx):
             idx = idx.tolist()
-            
+
         start = time.time()
         images = self.dataset[idx][0]
         end = time.time()-start
         #with open('coco_times.txt', 'a') as the_file:
             #the_file.write(str(end)+'\n')
-        
         image_input = torch.tensor(np.stack(images))
         image_input -= image_mean[:, None, None]
         image_input /= image_std[:, None, None]
-        
+
         anns = self.dataset[idx][1]
         labels_binary = np.zeros(80)
-        
+
         cats = []
         if len(anns)>0:
             img_id = anns[0]['image_id']
@@ -129,12 +107,11 @@ class Coco(Dataset):
         for ann in anns:
             x = ann['category_id']
             cats.append(self.coco_object2id[x])
-            
         cats = np.array(cats)
         assert((cats >=0).all() and (cats <= 79).all())
-        if(len(cats) ==0):
+        if len(cats) ==0:
             sample = (image_input, labels_binary)
-        else:    
+        else: 
             labels_binary[cats] = 1
             sample = (image_input, labels_binary)
         return sample
@@ -296,10 +273,8 @@ class OpenImages(Dataset):
             end = time.time()-start
             #with open('openimages_times.txt', 'a') as the_file:
                 #the_file.write(str(end)+'\n')
-        
         labels_img = self.box_labels[image_path.stem]
         labels_binary = np.zeros(self.num_classes)
-        
         cats = []
         if self.split=='val':
             if len(labels_img)>0:
@@ -311,7 +286,7 @@ class OpenImages(Dataset):
         assert((cats >=0).all() and (cats <= self.num_classes-1).all())
         if(len(cats) ==0):
             sample = (image, labels_binary)
-        else:    
+        else:
             labels_binary[cats] = 1
             sample = (image, labels_binary)
         return sample

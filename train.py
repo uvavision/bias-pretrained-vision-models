@@ -4,38 +4,17 @@ import subprocess
 import numpy as np
 import json, os, sys, random, pickle
 import torchvision.datasets as dset
-from torchvision import transforms 
 import os
-import skimage
-#import IPython.display
-#import matplotlib.pyplot as plt
 from PIL import Image
 import urllib
 from collections import OrderedDict
 import torchvision.datasets as dset
-from torchvision import transforms 
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize, RandomCrop
-import skimage
-import IPython.display
 import urllib
 from collections import OrderedDict
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-from torchvision import datasets, models, transforms
 import time
 import copy
-import tqdm
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import f1_score
-from sklearn import metrics
-from sklearn.metrics import accuracy_score
-import clip
-#from skimage import io
-from pycocotools.coco import COCO
-from sklearn.preprocessing import StandardScaler
-
 import torch
 print("Torch version:", torch.__version__)
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -54,14 +33,14 @@ from pytorch_lightning.loggers import TensorBoardLogger
 
 def lightning_setup(args):
     """Loads a finetuned model into memory and returns it for bias analysis
-    
+
     Returns:
         model_ft: finetuned model from args.trial_path
     """
     model_ft = None
-    models_implemented = ['moco_resnet50', 'simclr_resnet50', 'alexnet', 'vgg', 'densenet', 'fasterrcnn', 'retinanet', 'googlenet', 'resnet18', 'resnet34', 'resnet50', 
+    models_implemented = ['moco_resnet50', 'simclr_resnet50', 'alexnet', 'vgg', 'densenet', 'fasterrcnn', 'retinanet', 'googlenet', 'resnet18', 'resnet34', 'resnet50',
                     'resnet101', 'resnet152', 'resnext50_32x4d', 'resnext101_32x8d', 'wide_resnet50_2', 'wide_resnet101_2', 'bit_resnet50', 'virtex_resnet50']
-    if args.model_name == 'clip': 
+    if args.model_name == 'clip':
         model_setup = CLIP_model(args, args.trial_path)
         model_ft, _, _ = model_setup.setup_model()
         checkpoint = torch.load(args.trial_path+'/model/model.pt')
@@ -73,9 +52,9 @@ def lightning_setup(args):
         ckpt = os.listdir(base)[0]
         checkpoint = torch.load(base+ckpt)
         checkpoint['state_dict'] = dict(checkpoint['state_dict'])
-        state_dict_mod = dict()
+        state_dict_mod = {}
         for i in checkpoint['state_dict']:
-            state_dict_mod[i[6:]] = checkpoint['state_dict'][i] 
+            state_dict_mod[i[6:]] = checkpoint['state_dict'][i]
         model_setup.model.load_state_dict(state_dict_mod)
         model_ft = model_setup.model.eval()
     else:
@@ -89,7 +68,7 @@ def lightning_train(args, dataloaders: dict, model_path: str, resume_training: b
         dataloaders: A dictionary with train and val pytorch dataloader objects
         model_path: Path to save the model's metadata for a trial
         resume_training: If true, uses saved checkpoint in model_path to resume training
-    
+
     Returns:
         model_ft: finetuned model in eval mode 
     """
@@ -116,7 +95,6 @@ def lightning_train(args, dataloaders: dict, model_path: str, resume_training: b
             trainer = Trainer(gpus=1, default_root_dir=model_path+'/model', logger=logger, callbacks=[], max_epochs=args.epochs, resume_from_checkpoint=args.checkpoint)
             trainer.fit(model_setup, dataloaders['train'], dataloaders['val'])
             trainer.validate(dataloaders=dataloaders['val'])
-            
             base = model_path + '/model/'+args.model_name +'/' +'version_0/checkpoints/'
             ckpt = os.listdir(base)[0]
             checkpoint = torch.load(base+ckpt)
@@ -142,11 +120,10 @@ def lightning_train(args, dataloaders: dict, model_path: str, resume_training: b
             trainer = Trainer(gpus=args.num_gpus, default_root_dir=model_path+'/model', logger=logger, callbacks=[], max_epochs=args.epochs)
             trainer.fit(model_setup, dataloaders['train'], dataloaders['val'])
             trainer.validate(dataloaders=dataloaders['val'])
-            
             base = model_path + '/model/'+args.model_name +'/' +'version_0/checkpoints/'
             ckpt = os.listdir(base)[0]
-            PATH = base+ckpt
-            checkpoint = torch.load(PATH)
+            path = base+ckpt
+            checkpoint = torch.load(path)
             checkpoint['state_dict'] = dict(checkpoint['state_dict'])
             state_dict_mod = dict()
             for i in checkpoint['state_dict']:

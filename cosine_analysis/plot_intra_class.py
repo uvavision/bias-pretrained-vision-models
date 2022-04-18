@@ -7,42 +7,21 @@ import matplotlib.lines as mlines
 from data_loader import V
 
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 import subprocess
 import numpy as np
 import json, os, sys, random, pickle
 import torchvision.datasets as dset
-from torchvision import transforms 
 import os
-import skimage
-#import IPython.display
-#import matplotlib.pyplot as plt
 from PIL import Image
 import urllib
 from collections import OrderedDict
 import torchvision.datasets as dset
-from torchvision import transforms 
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-import skimage
-import IPython.display
 import urllib
 from collections import OrderedDict
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-from torchvision import datasets, models, transforms
 import time
 import copy
-import tqdm
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import f1_score
-from sklearn import metrics
-from sklearn.metrics import accuracy_score
-import clip
-#from skimage import io
-from pycocotools.coco import COCO
-from sklearn.preprocessing import StandardScaler
 from scipy import stats
 import torch
 print("Torch version:", torch.__version__)
@@ -55,7 +34,6 @@ import matplotlib.pyplot as plt
 plt.figure(num=None, figsize=(10, 8), dpi=1500, facecolor='w', edgecolor='k')
 from matplotlib.font_manager import FontProperties
 import yaml
-import dcor 
 import itertools
 import matplotlib.cm as cm
 import datetime
@@ -68,17 +46,17 @@ fontP.set_size('small')
 def plot_indiv_categories(model_name, dataset_name, save_path, category_features, comps_stats, self_similarities_stats, category_name):
     """Plots bias analysis experiment results for 'Indiv' subset of classes
     'Indiv': single classes --> man, woman, surfboard, car, refrigerator, etc. (intra-class)
-    
+
     Args:
         model_name: Name of model to perform bias metric experiment on
         dataset_name: Analysis set
         save_path: Path to save bias analysis experiment results
         category_features: Classes to be plotted
         comps_stats: Dictionary mapping class comparisons (ex. man+woman vs. man) defined in COMPS in config to
-                     a tuple of (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() for features extracted 
+                     a tuple of (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() for features extracted
                      from pretrained model
-        self_similarities_stats: Dictionary mapping class names (LABEL_NAMES in config) to a tuple of 
-                                 (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() 
+        self_similarities_stats: Dictionary mapping class names (LABEL_NAMES in config) to a tuple of
+                                 (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity()
                                  for features extracted from pretrained model
         category_name: Name of single class: 'car, surfboard, refrigerator' etc. --> config['INDIVIDUAL_PLOTS']['category_list']
         
@@ -117,38 +95,38 @@ def plot_indiv_categories(model_name, dataset_name, save_path, category_features
 def plot_indiv_cats_comps(model_name, dataset_name, save_path, mins_maxes_pt, mins_maxes_ft, mins_maxes_comps_pt, mins_maxes_comps_ft, comps_stats, comps_stats_ft, self_similarities_stats, self_similarities_stats_ft, category_name, category_features):
     """Plots bias analysis experiment results for 'Comps' subset of classes: 
     'Comps' compares two classes --> man vs. surfboard, woman+car vs woman etc. (inter-class)
-    
+
     Args:
         model_name: Name of model to perform bias metric experiment on
         dataset_name: Analysis set
         save_path: Path to save averaged results, ex. 'experiments/'+train_dataset+'/' +model_name +'/'+ 'averaged'
-        mins_maxes_pt: Dictionary mapping class name (V in config file) to a list of mins and maxes of 
-                       bias metric iterations (result of intra_class_similarity_error_bars() and 
+        mins_maxes_pt: Dictionary mapping class name (V in config file) to a list of mins and maxes of
+                       bias metric iterations (result of intra_class_similarity_error_bars() and
                        inter_class_similarity_error_bars()) for features extracted from pretrained model for intra-class
-        mins_maxes_ft: Dictionary mapping class name (LABEL_NAMES in config file) to a list of mins and maxes of 
-                       bias metric iterations (result of intra_class_similarity_error_bars() and 
+        mins_maxes_ft: Dictionary mapping class name (LABEL_NAMES in config file) to a list of mins and maxes of
+                       bias metric iterations (result of intra_class_similarity_error_bars() and
                        inter_class_similarity_error_bars()) for features extracted from finetuned model for intra-class
-        mins_maxes_comps_pt: Dictionary mapping class name (LABEL_NAMES in config file) to a list of mins and maxes of 
-                             bias metric iterations (result of intra_class_similarity_error_bars() and 
+        mins_maxes_comps_pt: Dictionary mapping class name (LABEL_NAMES in config file) to a list of mins and maxes of
+                             bias metric iterations (result of intra_class_similarity_error_bars() and
                              inter_class_similarity_error_bars()) for features extracted from pretrained model for inter-class
-        mins_maxes_comps_ft: Dictionary mapping class name (LABEL_NAMES in config file) to a list of mins and maxes of 
-                             bias metric iterations (result of intra_class_similarity_error_bars() and 
+        mins_maxes_comps_ft: Dictionary mapping class name (LABEL_NAMES in config file) to a list of mins and maxes of
+                             bias metric iterations (result of intra_class_similarity_error_bars() and
                              inter_class_similarity_error_bars()) for features extracted from finetuned model for inter-class
         comps_stats: Dictionary mapping class comparisons (ex. man+woman vs. man) defined in COMPS in config to
-                     a tuple of (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() for features extracted 
+                     a tuple of (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() for features extracted
                      from pretrained model
         comps_stats_ft: Dictionary mapping class comparisons (ex. man+woman vs. man) defined in COMPS in config to
-                     a tuple of (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() for features extracted 
+                     a tuple of (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() for features extracted
                      from finetuned model
-        self_similarities_stats: Dictionary mapping class names (LABEL_NAMES in config) to a tuple of 
-                                 (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() 
+        self_similarities_stats: Dictionary mapping class names (LABEL_NAMES in config) to a tuple of
+                                 (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity()
                                  for features extracted from pretrained model
-        self_similarities_stats_ft: Dictionary mapping class names (LABEL_NAMES in config) to a tuple of 
-                                 (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity() 
+        self_similarities_stats_ft: Dictionary mapping class names (LABEL_NAMES in config) to a tuple of
+                                 (cos, std, sim_std, sim_mean) --> the output of inter_class_similarity()
                                  for features extracted from finetuned model
         category_name: Name of single class: 'car, surfboard, refrigerator' etc. --> config['INDIVIDUAL_PLOTS']['category_list']
         category_features: Classes to be plotted: config['INDIVIDUAL_PLOTS_COMPS'][category_name]
-        
+
     """
 
     y_dict = dict()
@@ -186,13 +164,13 @@ def plot_indiv_cats_comps(model_name, dataset_name, save_path, mins_maxes_pt, mi
             y_err.append(mins_maxes_pt[key])
         else:
             y_err.append(mins_maxes_comps_pt[key])
-        
+
     for key in y_dict_comp:
         if key in mins_maxes_ft:
             y_err_ft.append(mins_maxes_ft[key])
         else:
             y_err_ft.append(mins_maxes_comps_ft[key])
-         
+
     yerr_vals = np.asarray(y_err).T
     yerr_vals_ft = np.asarray(y_err_ft).T
 

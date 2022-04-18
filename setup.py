@@ -6,45 +6,23 @@ import json, os, sys, random, pickle
 import torchvision.datasets as dset
 from torchvision import transforms 
 import os
-import skimage
-#import IPython.display
-#import matplotlib.pyplot as plt
 from PIL import Image
 import urllib
 from collections import OrderedDict
 import torchvision.datasets as dset
 from torchvision import transforms 
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize, RandomCrop
-import skimage
-import IPython.display
+from torchvision.transforms import Resize, CenterCrop, ToTensor, RandomCrop
 import urllib
 from collections import OrderedDict
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-from torchvision import datasets, models, transforms
+from torchvision import transforms
 import time
 import copy
-import tqdm
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import f1_score
-from sklearn import metrics
-from sklearn.metrics import accuracy_score
-import clip
-#from skimage import io
-from pycocotools.coco import COCO
-from sklearn.preprocessing import StandardScaler
-
 import torch
 print("Torch version:", torch.__version__)
 torch.multiprocessing.set_sharing_strategy('file_system')
-
-
 import yaml
-from pytorch_lightning import Trainer, seed_everything
-from pytorch_lightning.loggers import TensorBoardLogger
-
 from data_loader import *
 
 def setup_dirs(base_path: str, from_scratch: bool = False):
@@ -90,7 +68,7 @@ def setup_dirs(base_path: str, from_scratch: bool = False):
 def setup_dataset(args):
     """Generates pytorch dataloaders with train and val split for finetuning dataset
     """
-    dataloaders_dict = dict()
+    dataloaders_dict = {}
     if args.dataset == 'coco':
         if args.model_name == 'clip':
             crop_size = 224

@@ -6,36 +6,21 @@ import json, os, sys, random, pickle
 import torchvision.datasets as dset
 from torchvision import transforms 
 import os
-import skimage
-#import IPython.display
-#import matplotlib.pyplot as plt
 from PIL import Image
 import urllib
 from collections import OrderedDict
 import torchvision.datasets as dset
 from torchvision import transforms 
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-import skimage
-import IPython.display
 import urllib
 from collections import OrderedDict
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-from torchvision import datasets, models, transforms
+from torchvision import transforms
 import time
 import copy
-import tqdm
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import fbeta_score
-
-from sklearn import metrics
-from sklearn.metrics import accuracy_score
-import clip
-#from skimage import io
-from pycocotools.coco import COCO
 from sklearn.preprocessing import StandardScaler
 
 import torch
@@ -49,7 +34,6 @@ from model_init import *
 from data_loader import *
 from cosine_analysis.cosine_exp import *
 from train import *
-import torchmetrics 
 from sklearn.decomposition import PCA
 import pytorch_lightning as pl
 from utils import *
@@ -93,7 +77,6 @@ class LitPytorchModels(pl.LightningModule):
             }
         else:
             self.scheduler = None
-        
 
         self.model_path = model_path
 
@@ -106,7 +89,7 @@ class LitPytorchModels(pl.LightningModule):
             return self.optimizer
         else:
             return {"optimizer": self.optimizer, "lr_scheduler": self.lr_scheduler_config}
-    
+
     def training_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.model(inputs.float())
@@ -122,7 +105,7 @@ class LitPytorchModels(pl.LightningModule):
             torch.save(inputs[:10], self.model_path+"/model/updates/train_inputs_"+str(batch_idx)+".pt")
             torch.save(labels[:10], self.model_path+"/model/updates/train_labels_"+str(batch_idx)+".pt")
             torch.save(preds[:10], self.model_path+"/model/updates/train_preds_"+str(batch_idx)+".pt")
-        
+
         logs = {"train_loss": loss}
         batch_dictionary = {
             'loss': loss,
@@ -154,7 +137,7 @@ class LitPytorchModels(pl.LightningModule):
             # for logging purposes
             'log': tensorboard_logs}
         print('F1: {:.4f} mAP: {:.4f} fbeta: {:.4f}  Micro f1: {:.4f} Loss: {:.4f}'.format(task_f1_score, meanAP, fbeta, task_f1_score_micro, avg_loss))
-        
+
         self.log('Avg Training Loss', avg_loss, on_step=False, on_epoch=True)
         self.log('Train Macro F1 Score', torch.tensor(task_f1_score), on_step=False, on_epoch=True)
         self.log('Train Micro F1 Score', torch.tensor(task_f1_score_micro), on_step=False, on_epoch=True)
@@ -173,7 +156,7 @@ class LitPytorchModels(pl.LightningModule):
             torch.save(inputs, self.model_path+"/model/updates/val_inputs_"+str(batch_idx)+".pt")
             torch.save(labels, self.model_path+"/model/updates/val_labels_"+str(batch_idx)+".pt")
             torch.save(preds, self.model_path+"/model/updates/val_preds_"+str(batch_idx)+".pt")
-        
+
         logs = {"val_loss": loss}
         batch_dictionary = {
             'loss': loss,
@@ -207,7 +190,7 @@ class LitPytorchModels(pl.LightningModule):
         print('F1: {:.4f} mAP: {:.4f} fbeta: {:.4f}  Micro f1: {:.4f} Loss: {:.4f}'.format(task_f1_score, meanAP, fbeta, task_f1_score_micro, avg_loss))
 
         self.log('Avg Validation Loss', avg_loss, on_step=False, on_epoch=True)
-        
+
         self.log('Val Macro F1 Score', torch.tensor(task_f1_score), on_step=False, on_epoch=True)
         self.log('Val Micro F1 Score', torch.tensor(task_f1_score_micro), on_step=False, on_epoch=True)
         self.log('Val FBeta Score', torch.tensor(fbeta), on_step=False, on_epoch=True)
@@ -221,9 +204,9 @@ class PytorchFeatureExtractor():
     Attributes:
         dataset: The dataset used to extract features on --> analysis set
         model_path: Path to model trial that defines where to save the features: ex. 'experiments/coco/bit_resnet50/2022-01-15 14:18:21'
-        model_name: Name of model to perform feature extraction on 
-        num_classes: Number of classes in dataset 
-       
+        model_name: Name of model to perform feature extraction on
+        num_classes: Number of classes in dataset
+
     """
 
     def __init__(self, args, model_path):
@@ -232,7 +215,7 @@ class PytorchFeatureExtractor():
         self.model_path = model_path
         self.model_name = args.model_name
         self.num_classes = args.num_classes
-        
+
 
     def process_imgs(self, directory: list):
         """Preprocesses a list of tensor images using standard transformations"""
@@ -309,7 +292,7 @@ class PytorchFeatureExtractor():
                 temp_model.head = temp_model.head[:-1]
                 features = self.extract_features_model(temp_model, images)
         return features
-    
+
     def pca_analysis(self, features, pca_comps: float, path: str):
         """Performs PCA analysis on the features after they have been extracted"""
         feature_list = list(features.values())
@@ -318,23 +301,22 @@ class PytorchFeatureExtractor():
         for feature in feature_list:
             all_images_sizes.append(feature.shape[0])
         all_images_sizes = np.cumsum(all_images_sizes)
-                
+
         all_features = np.concatenate(feature_list)
         if pca_comps > 1.0:
             comps = min(all_features.shape[0], all_features.shape[1])
             if pca_comps > comps:
                 pca_comps = comps
-        pca = PCA(n_components=int(pca_comps)) 
+        pca = PCA(n_components=int(pca_comps))
         features_transformed = pca.fit_transform(all_features)
         print(pca.singular_values_)
-        
+
         features_transformed_dict = dict()
         features_split = np.split(features_transformed, all_images_sizes)
         for key, feature_transformed in zip(features, features_split):
             features_transformed_dict[key] = feature_transformed
-            np.save(path + key, feature_transformed) 
+            np.save(path + key, feature_transformed)
         return features_transformed_dict
-         
 
     def extract_features(self, args, model_ft=None, only_pretrained: bool = False):
         """Extracts and saves the features in model_path"""
@@ -372,7 +354,7 @@ class PytorchFeatureExtractor():
             all_features = dict()
             all_features_ft = dict()
             all_features_pt = dict()
-            
+
             for category in analysis_data_loaded:
                 for subcategory in analysis_data_loaded[category]:
                     print("Building features for: ", analysis_data_names[category][subcategory])

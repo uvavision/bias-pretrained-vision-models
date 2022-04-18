@@ -4,36 +4,23 @@ import subprocess
 import numpy as np
 import json, os, sys, random, pickle
 import torchvision.datasets as dset
-from torchvision import transforms 
 import os
-import skimage
-#import IPython.display
-#import matplotlib.pyplot as plt
 from PIL import Image
 import urllib
 from collections import OrderedDict
 import torchvision.datasets as dset
-from torchvision import transforms 
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-import skimage
-import IPython.display
+from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor
 import urllib
 from collections import OrderedDict
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-from torchvision import datasets, models, transforms
 import time
 import copy
 import tqdm
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import f1_score
-from sklearn import metrics
 from sklearn.metrics import accuracy_score
 import clip
-#from skimage import io
-from pycocotools.coco import COCO
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import fbeta_score
 
@@ -56,8 +43,6 @@ import os
 import torch
 from torch import nn
 import torch.nn.functional as F
-from torchvision import transforms
-from torch.utils.data import DataLoader, random_split
 import pytorch_lightning as pl
 
 #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -86,10 +71,10 @@ class CLIP_model():
 
     def convert_models_to_fp32(self, model):
         """ Converts model parameters to floating point for training"""
-        for p in model.parameters(): 
-            p.data = p.data.float() 
-            p.grad.data = p.grad.data.float() 
-            
+        for p in model.parameters():
+            p.data = p.data.float()
+            p.grad.data = p.grad.data.float()
+
     def convert_weights(self, model):
         """Convert applicable model parameters to fp16 for mixed precision training"""
 
@@ -138,11 +123,11 @@ class CLIP_model():
 
                 running_loss = 0.0
                 running_corrects = 0
-                
+
                 for i, (inputs, labels) in (enumerate(tqdm.tqdm(dataloaders[phase]))):
                     optimizer.zero_grad()
                     with torch.cuda.amp.autocast():
-                        
+
                         preds = model(inputs.type(torch.half).cuda())
                         loss = criterion(preds, labels.to(preds.dtype).cuda())
                         preds_sigmoid = torch.sigmoid(preds)
@@ -172,7 +157,6 @@ class CLIP_model():
                                 res = list()
                                 epoch_acc = accuracy_score(total_targets.numpy(), (total_preds >= 0.5).long().numpy())
                                 print('{} F1: {:.4f} mAP: {:.4f} fbeta: {:.4f}  Micro f1: {:.4f}'.format(phase, task_f1_score, meanAP, fbeta, task_f1_score_micro))
-                                            
                                     # statistics
                                 running_loss += loss.item() * inputs.size(0)
 
@@ -181,14 +165,12 @@ class CLIP_model():
                     total_targets = torch.cat([entry[1] for entry in res], 0)
                     task_f1_score = f1_score(total_targets.numpy(), (total_preds >= 0.5).long().numpy(), average = 'macro')
                     task_f1_score_micro = f1_score(total_targets.numpy(), (total_preds >= 0.5).long().numpy(), average = 'micro')
-
                     fbeta = fbeta_score(total_targets.numpy(), (total_preds >= 0.3).long().numpy(), 1.0, average='samples')
                     meanAP = average_precision_score(total_targets.numpy(), total_preds.numpy(), average='macro')
                     epoch_acc = accuracy_score(total_targets.numpy(), (total_preds >= 0.5).long().numpy())
                     #res = list()
                     epoch_acc = accuracy_score(total_targets.numpy(), (total_preds >= 0.5).long().numpy())
                     print('{} F1: {:.4f} mAP: {:.4f} fbeta: {:.4f}  Micro f1: {:.4f}'.format(phase, task_f1_score, meanAP, fbeta, task_f1_score_micro))
-                                
                         # statistics
                     running_loss += loss.item() * inputs.size(0)
                 # deep copy the model
@@ -219,7 +201,7 @@ class ClipViTFeatureExtractor():
     Attributes:
         dataset: The dataset used to extract features on --> analysis set
         model_path: Path to model trial that defines where to save the features: ex. 'experiments/coco/bit_resnet50/2022-01-15 14:18:21'
-       
+
     """
 
     def __init__(self, args, model_path):
@@ -244,7 +226,7 @@ class ClipViTFeatureExtractor():
             # if adding a new analysis set, specify how to open the images in the .txt files in analysis_sets/
             else:
                 print("Dataset not implemented")
-            images.append(image) 
+            images.append(image)
         return images
 
     def extract_features_clip_ft(self, images, model_ft, normalize='norm_one'):
@@ -278,23 +260,23 @@ class ClipViTFeatureExtractor():
         if normalize == 'norm_one':
             image_features /= image_features.norm(dim=-1, keepdim=True)
         else:
-            scaler = StandardScaler() 
+            scaler = StandardScaler()
             image_features = scaler.fit_transform(image_features.cpu())
         return torch.tensor(image_features)
-    
+
     def build_features_pt(self, images):
         images = self.process_images(images)
-        torch.backends.cudnn.benchmark = True 
+        torch.backends.cudnn.benchmark = True
         model, preprocess = clip.load("ViT-B/32", jit=False) #Must set jit=False for training
         model = model.cuda()
         features = self.extract_features_clip_pt(images, model)
         return features
-    
+
     def build_features_ft(self, model_ft, images):
         images = self.process_images(images)
         features = self.extract_features_clip_ft(images, model_ft)
         return features
-    
+
     def pca_analysis(self, features, pca_comps, path):
         """Performs PCA analysis on the features after they have been extracted"""
         feature_list = list(features.values())
@@ -303,7 +285,7 @@ class ClipViTFeatureExtractor():
         for feature in feature_list:
             all_images_sizes.append(feature.shape[0])
         all_images_sizes = np.cumsum(all_images_sizes)
-                
+
         all_features = np.concatenate(feature_list)
         if pca_comps > 1.0:
             comps = min(all_features.shape[0], all_features.shape[1])
@@ -312,14 +294,14 @@ class ClipViTFeatureExtractor():
         pca = PCA(n_components=int(pca_comps))
         features_transformed = pca.fit_transform(all_features)
         print(pca.singular_values_)
-        
+
         features_transformed_dict = dict()
         features_split = np.split(features_transformed, all_images_sizes)
         for key, feature_transformed in zip(features, features_split):
             features_transformed_dict[key] = feature_transformed
-            np.save(path + key, feature_transformed) 
+            np.save(path + key, feature_transformed)
         return features_transformed_dict
-    
+
     def extract_features(self, args, model_ft=None, only_pretrained=False):
         """Extracts and saves the features in model_path"""
         save_path = self.model_path+"/"

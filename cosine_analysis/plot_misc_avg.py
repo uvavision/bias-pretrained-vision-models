@@ -7,42 +7,21 @@ import matplotlib.lines as mlines
 from data_loader import V
 
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 import subprocess
 import numpy as np
 import json, os, sys, random, pickle
 import torchvision.datasets as dset
-from torchvision import transforms 
 import os
-import skimage
-#import IPython.display
-#import matplotlib.pyplot as plt
 from PIL import Image
 import urllib
 from collections import OrderedDict
 import torchvision.datasets as dset
-from torchvision import transforms 
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-import skimage
-import IPython.display
 import urllib
 from collections import OrderedDict
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-from torchvision import datasets, models, transforms
 import time
 import copy
-import tqdm
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import f1_score
-from sklearn import metrics
-from sklearn.metrics import accuracy_score
-import clip
-#from skimage import io
-from pycocotools.coco import COCO
-from sklearn.preprocessing import StandardScaler
 from scipy import stats
 import torch
 print("Torch version:", torch.__version__)
@@ -70,7 +49,7 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
     'Indiv': single classes --> man, woman, surfboard, car, refrigerator, etc. (intra-class)
     'Pairs': multi-label --> man+surfboard, woman+car, etc. (intra-class)
     'Comps' compares two classes --> man vs. surfboard, woman+car vs woman etc. (inter-class)
-    
+
     Args:
         model_name: Name of model to perform bias metric experiment on
         dataset_name: Analysis set
@@ -101,7 +80,7 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
                                  for features extracted from finetuned model
         category_features: Classes to be plotted
         plot_type: Indiv, Pairs, Comps --> subset of classes in analysis set
-        
+
     """
     y_dict = dict()
     y_dict_ft = dict()
@@ -132,7 +111,7 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
             y_err.append(mins_maxes_pt[key])
         else:
             y_err.append(mins_maxes_comps_pt[key])
-        
+
     for key in y_dict_comp:
         if key in mins_maxes_ft:
             y_err_ft.append(mins_maxes_ft[key])
@@ -186,7 +165,6 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
 
     # plt.legend(labels, loc='lower left', ncol=12)
     if plot_type == 'pairs':
-
         title = "Averaged Paired Classes, Model: "+ model_name + " Finetuned on: " + dataset_name + "<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
         title_diff = "Averaged, Model: "+model_name + " Finetuned on: " + dataset_name + ", Paired Classes (Finetuned - Pretrained)"
         save = save_path + '/boxplots/'+ dataset_name + '/'+'pairs_averaged.pdf'
@@ -223,7 +201,7 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
         bbox = (0.5, -0.65)
         bottom_legend = -0.9
         bottom = 0.5
-    
+
     fig.update_layout(
         title={
             'text': title,
@@ -242,7 +220,7 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
         yaxis=dict(
             title="cosine score",  
             linecolor="#BCCCDC",  # Sets color of Y-axis line
-            showgrid=True,  # Removes Y-axis grid lines    
+            showgrid=True,  # Removes Y-axis grid lines
         ),
         legend=dict(
             yanchor="bottom",
@@ -272,7 +250,7 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
 
 def get_multiple_trials_stats(list_dicts):
     """Averages cosine and error bar stats across all trials for a model
-    
+
     Args:
         list_dicts: List of dictionaries where each dictionary corresponds to a single trial for a model ex. [{class_name: (list[cos], mean of cosine similarities), ... } ...]
     Returns:
@@ -282,7 +260,7 @@ def get_multiple_trials_stats(list_dicts):
     """
     final = dict()
     mins_maxes = dict()
-    
+
     for category in list_dicts[0]: # iterating over dictionary keys
         # each category, trial[category] = cos, std, sim_std, sim_mean
         final[category] = [[], 0.0]

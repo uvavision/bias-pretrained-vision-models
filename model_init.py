@@ -4,46 +4,27 @@ import subprocess
 import numpy as np
 import json, os, sys, random, pickle
 import torchvision.datasets as dset
-from torchvision import transforms 
 import os
-import skimage
-#import IPython.display
-#import matplotlib.pyplot as plt
 from PIL import Image
 import urllib
 from collections import OrderedDict
 import torchvision.datasets as dset
-from torchvision import transforms 
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-import skimage
-import IPython.display
 import urllib
 from collections import OrderedDict
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-from torchvision import datasets, models, transforms
+from torchvision import models
 import time
 import copy
-import tqdm
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import f1_score
-from sklearn import metrics
-from sklearn.metrics import accuracy_score
 import clip
-#from skimage import io
-from pycocotools.coco import COCO
-from sklearn.preprocessing import StandardScaler
 import wget 
 import torch
 print("Torch version:", torch.__version__)
 torch.multiprocessing.set_sharing_strategy('file_system')
 import os.path 
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from models_def.bit_model import *
 import models_def.resnet_model as resnet_self_supervised
-from torch.optim.optimizer import Optimizer, required
+from torch.optim.optimizer import Optimizer
 
 
 class LARS(Optimizer):
@@ -251,7 +232,7 @@ def set_parameter_requires_grad(model, feature_extracting: bool):
     Args:
         model: pytorch model object to update parameters
         feature_extracting: When false, finetune the whole model, when True, only update the reshaped layer parameters
-    
+
     Returns:
         updated model parameters depending on feature_extracting
     """
@@ -295,15 +276,15 @@ def load_models_pytorch(model_name: str, num_classes: int, use_pretrained: bool)
     To add a new model, add it to the model_init dictionary variable. Note that this only includes
     models available in torchvision. Other models such as bit_resnet50, and moco_resnet50 are not
     available in torchvision and thus require additional steps to be loaded. Furthermore, these models
-    also require different steps to modify the last layer for finetuning. For example, all the models 
+    also require different steps to modify the last layer for finetuning. For example, all the models
     initialized in model_init dictionary can be modified by doing the following:
 
     num_ftrs = model_ft.fc.in_features
-    model_ft.fc = nn.Linear(num_ftrs, num_classes), 
+    model_ft.fc = nn.Linear(num_ftrs, num_classes),
 
     ... if the model you are trying to add cannot be modified using this logic, add an additional
-    block to specify the model loading and initialization. Follow the examples for models: bit_resnet50, 
-    moco_resnet50, simclr_resnet50 etc. below. 
+    block to specify the model loading and initialization. Follow the examples for models: bit_resnet50,
+    moco_resnet50, simclr_resnet50 etc. below.
 
     Args:
         model_name: Pytorch model to load into memory from torchvision models
@@ -315,7 +296,7 @@ def load_models_pytorch(model_name: str, num_classes: int, use_pretrained: bool)
         model_ft: Loaded model with modified last layer
     """
     model_ft = None
-    model_init = dict()
+    model_init = {}
     model_init['resnet18'] = models.resnet18
     model_init['resnet34'] = models.resnet34
     model_init['resnet50'] = models.resnet50
@@ -386,7 +367,7 @@ def initialize_model_pytorch(model_name: str, num_classes: int, feature_extract:
         optimizer_name: Name of optimizer --- sgd, adam, adamax, or lars
         use_pretrained: If true, loads the weights of the pretrained version of the model from
                         torchvision models
-                        
+
     Returns:
         model_ft: Loaded model with modified last layer
         criterion: Pytorch BCEWithLogitsLoss
@@ -428,9 +409,9 @@ def initialize_model_pytorch(model_name: str, num_classes: int, feature_extract:
 
 def initialize_model_clip(num_classes: int, lr: float, momentum: float, optimizer_name: str):
     """ Sets up CLIP-ViT/B-32 model parameters for finetuning
-     
+
     CLIP-ViT/B-32 does not use pytorch lightning training due to some complicated mix precision
-    training logic so it is defined separately here. 
+    training logic so it is defined separately here.
 
     Args:
         num_classes: Number of classes in the dataset that the model is being finetuned on
