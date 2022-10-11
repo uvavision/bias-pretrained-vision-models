@@ -16,7 +16,9 @@ MISC_PLOTS:
     indiv : ['sports', 'fashion', 'mammal', 'car', 'random', 'stopsign', 'man', 'woman']
     pairs : ['sports+man', 'sports+woman', 'car+man', 'car+woman', 'fashion+man', 'fashion+woman','mammal+man', 'mammal+woman','random']
     comps : ['sports+man vs sports', 'sports+woman vs sports', 'sports vs random','car+man vs car', 'car+woman vs car', 'car vs random', 'fashion+man vs fashion', 'fashion+woman vs fashion', 'fashion vs random', 'mammal+man vs mammal', 'mammal+woman vs mammal', 'mammal vs random', 'random']
-    object : ['sports', 'sports vs man', 'sports vs woman', 'mammal', 'mammal vs man', 'mammal vs woman', 'fashion', 'fashion vs man', 'fashion vs woman',  'car', 'car vs man', 'car vs woman', 'random', 'random vs man', 'random vs woman', 'stopsign', 'stopsign vs man', 'stopsign vs woman']
+    #object : ['sports', 'sports vs man', 'sports vs woman', 'mammal', 'mammal vs man', 'mammal vs woman', 'fashion', 'fashion vs man', 'fashion vs woman',  'car', 'car vs man', 'car vs woman', 'random', 'random vs man', 'random vs woman', 'stopsign', 'stopsign vs man', 'stopsign vs woman']
+    object : ['sports vs man', 'sports vs woman', 'sports vs random', 'mammal vs man', 'mammal vs woman', 'mammal vs random', 'fashion vs man', 'fashion vs woman', 'fashion vs random', 'car vs man', 'car vs woman', 'car vs random', 'stopsign vs man', 'stopsign vs woman', 'random vs man', 'random vs woman']
+
 COMPS:
     'sports+man vs sports': ['sm', 'sa']
     'sports+woman vs sports': ['sw', 'sa']

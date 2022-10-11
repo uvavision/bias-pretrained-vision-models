@@ -13,7 +13,9 @@ MISC_PLOTS:
     indiv : ['refrig', 'surfb', 'car', 'random', 'stopsign', 'man', 'woman']
     pairs : ['refrig+man', 'refrig+woman', 'surfb+man', 'surfb+woman', 'car+man', 'car+woman', 'random']
     comps : ['refrig+man vs refrig', 'refrig+woman vs refrig', 'refrig vs random','surfb+man vs surfb', 'surfb+woman vs surfb', 'surfb vs random','car+man vs car', 'car+woman vs car', 'car vs random', 'random']
-    object : ['surfb', 'surfb vs man', 'surfb vs woman','car', 'car vs man', 'car vs woman', 'refrig', 'refrig vs man', 'refrig vs woman', 'random', 'random vs man', 'random vs woman', 'stopsign', 'stopsign vs man', 'stopsign vs woman']
+    #object : ['surfb', 'surfb vs man', 'surfb vs woman','car', 'car vs man', 'car vs woman', 'refrig', 'refrig vs man', 'refrig vs woman', 'random', 'random vs man', 'random vs woman', 'stopsign', 'stopsign vs man', 'stopsign vs woman']
+    object : ['surfb vs man', 'surfb vs woman', 'surfb vs random', 'car vs man', 'car vs woman', 'car vs random', 'refrig vs man', 'refrig vs woman', 'refrig vs random', 'stopsign vs man', 'stopsign vs woman', 'random vs man', 'random vs woman',]
+
 COMPS:
     'refrig+man vs refrig': ['rm', 'ra']
     'refrig+woman vs refrig': ['rw', 'ra']

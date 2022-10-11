@@ -93,6 +93,7 @@ CUDA_VISIBLE_DEVICES=\# python train.py \
 ```bash
 CUDA_VISIBLE_DEVICES=\# python train.py \
     --model_name <name of finetuned model: e.g. 'bit_resnet50'> \
+    --dataset <name of dataset the model was finetuned on: e.g. 'coco'> \
     --num_classes <number of classes in dataset the model was finetuned on> \
     --load_features \
     --multiple_trials \

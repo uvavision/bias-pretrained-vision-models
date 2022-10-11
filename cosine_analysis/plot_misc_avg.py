@@ -194,6 +194,8 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
         plot_save_info = pd.DataFrame({'classes':labels, 'pt_means':y, 'pt_mins':temp_errs_mins, 'pt_maxes':temp_errs_maxes, 'ft_means':y_ft, 'ft_mins':temp_errs_ft_mins, 'ft_maxes':temp_errs_ft_maxes}).to_csv(save_path+'/metric_data/'+ dataset_name + '/'+'indiv_plot.csv', index=False)
 
     else:
+        with open(save_path+'/metric_data/'+ dataset_name + '/'+'spearman_object.log', 'w') as f:
+            f.write(str(round(spearman_coeff[0], 3)))
         title = "Averaged Class vs. Gender, Model: "+ model_name + " Finetuned on: " + dataset_name +"<br> Spearman Coeff: "+ str(round(spearman_coeff[0], 3)) + " @p " + str(round(spearman_coeff[1], 3))
         title_diff = "Averaged, Model: "+model_name + " Finetuned on: " + dataset_name +", Class vs. Gender (Finetuned - Pretrained)"
         save = save_path + '/boxplots/' + dataset_name + '/' + 'object_comp_averaged.pdf'
@@ -201,6 +203,8 @@ def plot_misc_mult_trials(model_name, dataset_name, save_path, mins_maxes_pt, mi
         bbox = (0.5, -0.65)
         bottom_legend = -0.9
         bottom = 0.5
+        plot_save_info = pd.DataFrame({'classes':labels, 'pt_means':y, 'pt_mins':temp_errs_mins, 'pt_maxes':temp_errs_maxes, 'ft_means':y_ft, 'ft_mins':temp_errs_ft_mins, 'ft_maxes':temp_errs_ft_maxes}).to_csv(save_path+'/metric_data/'+ dataset_name + '/'+'object_plot.csv', index=False)
+
 
     fig.update_layout(
         title={
@@ -255,7 +259,7 @@ def get_multiple_trials_stats(list_dicts):
         list_dicts: List of dictionaries where each dictionary corresponds to a single trial for a model ex. [{class_name: (list[cos], mean of cosine similarities), ... } ...]
     Returns:
         final: A dictionary mapping class name to a list of cosine similarity scores for each trial and the mean of all cosine results across all trials
-        mins_maxes: A dictionarry mapping class name to a list of mins_maxes defining the error bars for each class averaged across model trials
+        mins_maxes: A dictionary mapping class name to a list of mins_maxes defining the error bars for each class averaged across model trials
 
     """
     final = dict()
