@@ -114,7 +114,7 @@ dependencies:
   - mongodb=4.0.3=h597af5e_0
   - nbclient=0.5.2=pyhd8ed1ab_0
   - nbconvert=6.0.7=py36h5fab9bb_3
-  - nbformat=5.1.2=pyhd8ed1ab_1
+#  - nbformat=5.1.2=pyhd8ed1ab_1
   - ncurses=6.2=he6710b0_1
   - nest-asyncio=1.4.3=pyhd8ed1ab_0
   - ninja=1.10.2=py36hff7bd54_0
