@@ -1,6 +1,6 @@
 # Uncovering the Effects of Biases in Pretrained Visual Recognition Models
 
-[Jaspreet Ranjit](https://jr4fs.github.io/), [Tianlu Wang](https://tianlu-wang.github.io/), [Baishakhi Ray](https://www.rayb.info/), [Vicente Ordóñez](https://www.cs.rice.edu/~vo9/)
+[Jaspreet Ranjit](https://jr4fs.github.io/), [Tianlu Wang](https://tianlu-wang.github.io/), [Baishakhi Ray](https://www.rayb.info/), [Vicente Ordóñez](https://www.cs.rice.edu/~vo9/) AFT 2023
 
 ## Installation 
 ```bash
